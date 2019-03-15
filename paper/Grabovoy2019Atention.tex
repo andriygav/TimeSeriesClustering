@@ -24,19 +24,74 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \newcommand*{\No}{No.}
-
 \begin{document}
-
-\title{\bf ???\thanks{????}}
+\title{\bf Attention для апроксимизации временных рядов \thanks{????}}
 \date{}
+\author{}
 \maketitle
 
+\paragraph{1}
+Пусть задан временной ряд:
+$$T = \{t_n|t_n \in R, n = 1...N\}. \eqno(1)$$
+
+\paragraph{2}
+Используем LSTM с простейшим Attention без дополнительных параметров. Пример, принцепа работы seq2seq c Attention показан на рис.~\ref{fig1}.
+
+\paragraph{3}
+Введя предположения о том, что скрытые вектора LSTM имеет похожие вектора для похожих кусков временного ряда можно предположить, что матрица Attention будет иметь вид показан на рис.~\ref{fig2}. Под матрицей Attention подрозумевается матрица размера $n\times m$, где $n, m$ --- длины входного и выходного сигналов соответственно, в ячейках которой показан уровень схожести (либо можно сказать уровень зависимости) между куском временного ряда на выходе и куском временного ряда на входе.
+
+\paragraph{4}
+Предлагается использовать seq2seq, который просто копирует временной ряд. В этом методе есть ряд косяков.
+\begin{itemize}
+    \item Первый косяк состоит в том, что если мы учим копировать временной ряд, и берем слишком сложный Attention с большим количеством параметров, то он начинает переобучатся, и в итоге получается матрица Attention диагональной. Поэтому предлагается использовать просто скалярное произведение векторов (самую простую модель Attention, Dot метрика из~\ref{tab1}).
+    
+    \item 
+\end{itemize}
+
+\begin{table}[h!]
 \begin{center}
-\bf
-А.\,В.~Грабовой\footnote{Московский физико-технический институт, grabovoy.av@phystech.edu}, В.\,В.~Стрижов\footnote{Вычислительный центр им. А.~А. Дородницына ФИЦ ИУ РАН, strijov@ccas.ru}
+\caption{Описание разных Attention}
+\label{tab1}
+\begin{tabular}{|c|c|}
+\hline
+	Type & formula\\
+	\hline
+	Additive& $score_{i,j}~=~\tanh\left(\textbf{W}_e\textbf{e}_i+\textbf{W}_d\textbf{d}_j\right)$\\
+	\hline
+	Dot& $score_{i,j}~=~\textbf{e}_i^{\mathsf{T}}\textbf{d}_j$\\
+	\hline
+	General& $score_{i,j}~=~\textbf{e}_i^{\mathsf{T}}\textbf{W}\textbf{d}_j$\\
+\hline
+\end{tabular}
 
 \end{center}
+\end{table}
 
-\section{Аннотация}
-	
+\begin{figure}[h!]\center
+\subfloat[Описаниие seq2seq]{\includegraphics[width=0.5\textwidth]{figures/img1.pdf}\label{fig1}}
+\subfloat[Описаниие предполагаемых результатов]{\includegraphics[width=0.5\textwidth]{figures/img2.pdf}\label{fig2}}
+\caption{Основные сведения об seq2seq + Attention}
+\end{figure}
+
+\paragraph{5}
+Проведем простейший эксперимент. 
+
+\begin{figure}[h!t]\center
+\subfloat[$sin(x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries1.pdf}}
+\subfloat[$sin(x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention1.pdf}}\\
+\subfloat[$sin(2x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries2.pdf}}
+\subfloat[$sin(2x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention2.pdf}}\\
+\subfloat[$sin(8x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries3.pdf}}
+\subfloat[$sin(8x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention3.pdf}}\\
+
+\caption{Результаты для модели с рис.~\ref{fig1}}
+\label{fig3}
+\end{figure}
+
+
+
+Пусть модель обучена на синусоидальных сигналах произвольной частоты. Как видно из результатов на рис.~\ref{fig3}, предположение о виде матрицы Attention подтверждается. На рис~\ref{fig3} показано как меняется вид матрицы Attention в зависимости от частоты синуса. Видно что количество диагоналей в матрице Attention соответствует частоте синусоидального сигнала.
+
+
 \end{document}
+
