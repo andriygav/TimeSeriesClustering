@@ -320,8 +320,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \end{center}
 \end{table}
 
-\paragraph{Синтетические данные.}
-
 \begin{figure}[h!t]\center
 \subfloat[Synthetic 1]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_series}\label{fig_synthetic_series_2}}
@@ -329,17 +327,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 {\includegraphics[width=0.5\textwidth]{results/3_patern_series}\label{fig_synthetic_series_3}}\\
 \caption{Пример синтетически построенных временных рядов}
 \label{fig_synthetic_series}
-\end{figure}
-
-На рис.~\ref{fig_synthetic_series} приведен пример синтетически построенных временных рядов. На рис.~\ref{fig_synthetic_series_2} показан пример ряда в котором количество сигналов $K = 2$, а длина каждого сигнала $T = 20$. На рис.~\ref{fig_synthetic_series_3} показан пример ряда в котором количество сигналов $K = 3$, а длина каждого сигнала $T = 20$. 
-
-\begin{figure}[h!t]\center
-\subfloat[Synthetic 1]
-{\includegraphics[width=0.5\textwidth]{results/2_patern_lambda}}
-\subfloat[Synthetic 2]
-{\includegraphics[width=0.5\textwidth]{results/3_patern_lambda}}\\
-\caption{График зависимости значения сингулярных чисел метода главных компонент}
-\label{fig_synthetic_lambda}
 \end{figure}
 
 \begin{figure}[h!t]\center
@@ -351,8 +338,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \label{fig_synthetic_distance}
 \end{figure}
 
-На рис.~\ref{fig_synthetic_lambda} показан график зависимости значения сингулярных чисел локальной аппроксимации с течением времени. Значение сингулярных чисел, которые соответствуют первым двум главным компонентам значительно меняются с течением времени $t$. 
-
 \begin{figure}[h!t]\center
 \subfloat[Synthetic 1]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_2D_vector}}
@@ -361,7 +346,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \caption{Проекция точек временного ряда на плоскость при помощи матрицы попарных расстояний $\textbf{M}$}
 \label{fig_synthetic_2D}
 \end{figure}
-
 
 \begin{figure}[h!t]\center
 \subfloat[Synthetic 1]
@@ -372,9 +356,14 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \label{fig_synthetic_claster}
 \end{figure}
 
+
+\paragraph{Синтетические данные.}
+
+
+На рис.~\ref{fig_synthetic_series} приведен пример синтетически построенных временных рядов. На рис.~\ref{fig_synthetic_series_2} показан пример ряда в котором количество сигналов $K = 2$, а длина каждого сигнала $T = 20$. На рис.~\ref{fig_synthetic_series_3} показан пример ряда в котором количество сигналов $K = 3$, а длина каждого сигнала $T = 20$. 
+
 На рис.~\ref{fig_synthetic_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~$(\ref{solution}.8)$. Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_synthetic_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_synthetic_claster}.
 
-\paragraph{Реальные данные.}
 \begin{figure}[h!t]\center
 \subfloat[Physical Motion 1]
 {\includegraphics[width=0.5\textwidth]{results/1_real_series}}
@@ -384,8 +373,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \label{fig_real_series}
 \end{figure}
 
-На рис.~\ref{fig_real_series} приведен пример реальных временных рядов полученных при помощи взятия одной из координат мобильного акселерометра. 
-
 \begin{figure}[h!t]\center
 \subfloat[Physical Motion 1]
 {\includegraphics[width=0.5\textwidth]{results/1_real_full}}
@@ -394,9 +381,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \caption{Матрица попарных расстояний $\textbf{M}$ между точками временного ряда}
 \label{fig_real_distance}
 \end{figure}
-
-На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~$(\ref{solution}.8)$. Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
-
 
 \begin{figure}[h!t]\center
 \subfloat[Physical Motion 1]
@@ -416,6 +400,19 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \label{fig_real_claster}
 \end{figure}
 
+\paragraph{Реальные данные.}
+
+На рис.~\ref{fig_real_series} приведен пример реальных временных рядов полученных при помощи взятия одной из координат мобильного акселерометра. 
+
+
+
+На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~$(\ref{solution}.8)$. Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
+
+
+
+
+
+\section{Заключение}
 \begin{table}[h]
 \begin{center}
 \caption{Результаты работы алгоритма}
@@ -441,7 +438,6 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 \end{center}
 \end{table}
 
-\section{Заключение}
 В работе рассматривалась задача поиска характерных периодических структур внутри временного ряда. Рассматривался метод основаный на локальном снижение размерности фазового пространства. Был предложен алгоритм поиска характерных сигналов, который основывается на методе главных компонент для локального снижения размерности, а также на использовании некоторой функции расстояния между локальными базисами в каждый момент времени, которые интерпретировались как признакового описание точки временного ряда.
 
 В ходе эксперимента, на реальных показаниях акселерометра, а также на синтетических данных, было показано, что предложенный метод измерение расстояния между базисами хорошо разделяет точки которые принадлежат различным классам, что приводит к хорошей кластеризации объектов. Результаты работы, показаны в таблице~\ref{table_2}.
