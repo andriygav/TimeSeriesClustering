@@ -2,13 +2,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 
+\usepackage{amsthm}
+
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{mathrsfs}
 \usepackage{euscript}
-\usepackage{theorem}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{caption}
@@ -17,12 +18,20 @@
 \usepackage{tabularx}
 \usepackage{adjustbox}
 
-\usepackage{comment}
 
+\usepackage[toc,page]{appendix}
+
+\usepackage{comment}
 \usepackage{rotating}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{definition}{Определение}[section]
+
+\numberwithin{equation}{section}
 
 \newcommand*{\No}{No.}
 \begin{document}
@@ -34,140 +43,6 @@
 \date{}
 \author{}
 \maketitle
-
-\begin{comment}
-\section{Некоторое введение}
-Под временным рядом будет предполагать набор упорядоченных точек, которые получены путем наблюдения за некоторым непрерывным процессом с некоторой фиксированной частотой.
-
-
-\section{Модель seq2seq и Attention}
-
-\begin{figure}[h!]\center
-\subfloat[Описаниие seq2seq]{\includegraphics[width=0.5\textwidth]{figures/img1.pdf}\label{fig1}}
-\subfloat[Описаниие предполагаемых результатов]{\includegraphics[width=0.5\textwidth]{figures/img2.pdf}\label{fig2}}
-\caption{Основные сведения об seq2seq + Attention}
-\end{figure}
-
-Используем LSTM с простейшим Attention без дополнительных параметров. Пример, принцепа работы seq2seq c Attention показан на рис.~\ref{fig1}.
-
-\section{Предположения}
-Введя предположения о том, что скрытые вектора LSTM имеет похожие вектора для похожих кусков временного ряда можно предположить, что матрица Attention будет иметь вид показан на рис.~\ref{fig2}. Под матрицей Attention подрозумевается матрица размера $n\times m$, где $n, m$ --- длины входного и выходного сигналов соответственно, в ячейках которой показан уровень схожести (либо можно сказать уровень зависимости) между куском временного ряда на выходе и куском временного ряда на входе.
-
-\section{Проблемы}
-Предлагается использовать seq2seq, который просто копирует временной ряд. В этом методе есть ряд вопросов.
-\begin{itemize}
-    \item Первый косяк состоит в том, что если мы учим копировать временной ряд, и берем слишком сложный Attention с большим количеством параметров, то он начинает переобучатся, и в итоге получается матрица Attention диагональной. Это следует из того, что модель начинает просто учить друг за другом числа. Поэтому предлагается использовать просто скалярное произведение векторов (самую простую модель Attention, Dot метрика из~\ref{tab1}).
-    
-    \item Даже если взять простую модель Attention, все равно можно получить диагональную матрицу Attention, если мы просто будем копировать временной ряд, поэтому предлагается не просто учить все ряды из обучающего множества рядов, а на вход Encoder'а давать некоторый кусок (например из 100 сигналов ряда дать только первые 20 сигналов), и сравнивать как Decoder восстановит весь сигнал. Данный дополнительный финт немного улучшает качество.
-    
-    \item Второй вопрос состоит в том, что нужно придумать на каких данных учить данную модель (нужно подумать над тем какие сигналы давать на вход для копирования). Этот вопрос возникает в синтетических данных, но и в реальных данных. Я думаю, что можно модель учить не только на реальных данных, а и на синтетических, но для этого нужно придумать максимально правдоподобный сигнал акселерометра.
-    
-\end{itemize}
-
-\begin{table}[h!]
-\begin{center}
-\caption{Описание разных Attention}
-\label{tab1}
-\begin{tabular}{|c|c|}
-\hline
-	Type & formula\\
-	\hline
-	Additive& $score_{i,j}~=~\textbf{w}_o\tanh\left(\textbf{W}_e\textbf{e}_i+\textbf{W}_d\textbf{d}_j\right)$\\
-	\hline
-	Dot& $score_{i,j}~=~\textbf{e}_i^{\mathsf{T}}\textbf{d}_j$\\
-	\hline
-	General& $score_{i,j}~=~\textbf{e}_i^{\mathsf{T}}\textbf{W}\textbf{d}_j$\\
-\hline
-\end{tabular}
-
-\end{center}
-\end{table}
-
-\section{Эксперимент}
-\subsection{Эксперимент с простыми периодическими структурами}
-
-\begin{figure}[h!t]\center
-\subfloat[$sin(x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries1.pdf}}
-\subfloat[$sin(x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention1.pdf}}\\
-\subfloat[$sin(2x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries2.pdf}}
-\subfloat[$sin(2x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention2.pdf}}\\
-\subfloat[$sin(8x)$]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries3.pdf}}
-\subfloat[$sin(8x)$]{\includegraphics[width=0.5\textwidth]{figures/Attention3.pdf}}\\
-
-\caption{Результаты для модели с рис.~\ref{fig1}}
-\label{fig3}
-\end{figure}
-
-
-
-Пусть модель обучена на синусоидальных сигналах с произвольной частотой, произвольной амплитудой и произвольной начальной фазой. Как видно из результатов на рис.~\ref{fig3}, предположение о виде матрицы Attention подтверждается. На рис~\ref{fig3} показано как меняется вид матрицы Attention в зависимости от частоты синуса. Видно что количество диагоналей в матрице Attention соответствует частоте синусоидального сигнала.
-
-В работе~\cite{cinar2018} показано, что для нахождения периодов во временном ряде нельзя использовать простой Attention. Был пердложен модифицированный Attention который виглядит в следующем виде:
-
-$$e_{ij}=~=~\textbf{w}_o\tanh\left(\textbf{W}_e\left(\bm{\pi}_{i-j}\textbf{e}_i\right)+\textbf{W}_d\textbf{d}_j\right)\cdot \left[i-j \leq T\right], \eqno(1)$$
-где $\bm{\pi}$ --- еще один обучаемый вектор параметров, который указывает на степень зависимости $i$-го и $j$-го элемента.
-	
-Мои эксперименты показали, что прирост качества в двух разных Attention не очень большой, поэтому можно использовать любой из них.
-
-
-\subsection{Эксперимент с простыми переодическими структурами в случае размерности скрытого пространства $2$}
-
-
-\begin{figure}[h!t]\center
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries1_2dim.pdf}}
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/TimeSeries2_2dim.pdf}}\\
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/hidden1_2dim.pdf}}
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/hidden2_2dim.pdf}}\\
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/Attention1_2dim.pdf}}
-\subfloat[]{\includegraphics[width=0.5\textwidth]{figures/Attention2_2dim.pdf}}\\
-
-\caption{Результаты для модели с рис.~\ref{fig1}}
-\label{fig4}
-\end{figure}
-
-На рис.~\ref{fig4} показано, как для разных синусов выглядит скрытое пространство ecnoder'а, а также матрица Attention для генерации двух последующих точек в ряде.
-
-
-\subsection{Эксперимент с простыми двумя простыми периодическими структурами внутри одного ряда}
-
-Задача состоит в том, чтобы при помощи механизма Attention с временного ряда, который состоит из двух переодических сигналов (к примеру человек по очереди идет некоторое время и бежит некоторое время) выделить моменты времени где наблюдается первое действие и выделить моменты времени где наблюдается второе действие. 
-
-Предлагается использовать seq2seq модель с Attention. 
-
-Сама структура LSTM строит по сути фазовое пространство большой размерности. Попробуем обучить seq2seq модель, которая на вход принимает сигнал, который состоит из двух периодических сигналов, выдать на выход два сигнала, первый сигнал это чистый первый периодический сигнал со входа, а второй сигнал это второй периодический сигнал со входа. Тоесть другими словами, попробуем, сделать так, чтобы LSTM смогла из фазовому пространству вычленить два разных периодических сигнала. Для определенности будем считать первым периодическим сигналом тот сигнал который во временном ряде встретился раньше.
-
-Как сделать чтобы LSTM по одному входу дала два сигнала???? У этого вопроса есть два возможных ответа:
-\begin{itemize}
-    \item первый случай простой, а давайте выход декодера будет не число а два числа --- значения первого сигнала и второго сигнала в один тик времени (простыми словами у нас есть 2 линейные модели которые по фазовому пространству делают некоторый предикт сигнала)
-    
-    \item второе решение немного сложнее (сейчас пробую сделать его). У нас есть как и раньше один выход LSTM. Но мы можем варьировать начальную точку LSTM с которой она начинает генерировать ряд. К примеру если мы хочем получить первый сигнал, что в качестве начальной точки дадим $0$ а если хочем сгенериить второй сигнал, то начальной точкой LSTM дадим $1$.
-\end{itemize}
-Ничего не получилось.
-
-\begin{thebibliography}{99}
-	\bibitem{cinar2018}
-	\textit{Y. G. Cinar and H. Mirisaee} Period-aware content attention RNNs for time series forecasting with missing values~// Neurocomputing, 2018. Vol. 312. P. 177--186.
-	
-\end{thebibliography}
-
-\end{comment}
-\begin{comment}
-\section{Предположения}
-
-Введем следующие предположение:
-\begin{itemize}
-    \item Периоды всех сигналов прибьлизительно равны.\\
-    Пока работаем с учетом данного предположения, потом можно будет попытаться избавиться от данного условия.
-    \item Максимальный период $T$ сигналов известен.\\
-    Пока работаем в случае, когда мы знаем количесво различных сигналов во временном ряде, после этого можно попытаться это улучшить.
-    \item Известно количество $K$ различных сигналов.\\
-    Пока работаем в случае, когда мы знаем количество различных сигналов во временном ряде, после этого можно будет попытаться это улучшить.
-    \item Сигналы меняются не очень часто (подряд идет не менее 2-3 периодов одного сигнала)\\
-    Это нужно чтобы фазовое пространство "успевало" установиться. Тоесть не было бы случая, когда у нас все время меняются временные ряды.
-    \item Сигналы "достаточно" различны.\\
-    Над этим надо подумать как это определить, но суть в том, что нельзя чтобы это был один и тот же синус с только разными амплитудами, тогда базисные вектора будет одинаковые. Это плохо только тогда, когда длину базисного вектора не учитываем(сингулярное число), а если учесть то на синусах тоже все работает. (Над этим пунктом нужно сильно подумать).
-\end{itemize}
-\end{comment}
 
 \begin{center}
 \bf
@@ -208,91 +83,179 @@ $$e_{ij}=~=~\textbf{w}_o\tanh\left(\textbf{W}_e\left(\bm{\pi}_{i-j}\textbf{e}_i\
 
 
 
-\section{Постановка}\label{statment}
+\section{Постановка}
 
 Задан временной ряд:
-$$\textbf{x} \in \mathbb{R}^{N}, \eqno(\ref{statment}.1)$$
+\begin{equation}
+\label{eq:st:1}
+\begin{aligned}
+\textbf{x} \in \mathbb{R}^{N},
+\end{aligned}
+\end{equation}
 где $N$ количество точек, которыми задается временной ряд.
 
 Пусть временной ряд состоит из последовательности сигналов из множества $\mathbf{V}$:
-$$\textbf{x} = [\textbf{v}_1, \textbf{v}_2, \cdots, \textbf{v}_M], \eqno(\ref{statment}.2)$$
+\begin{equation}
+\label{eq:st:2}
+\begin{aligned}
+\textbf{x} = [\textbf{v}_1, \textbf{v}_2, \cdots, \textbf{v}_M],
+\end{aligned}
+\end{equation}
 где $\textbf{v}_i$ некоторый сигнал из множества возможных сигналов $\mathbf{V}$. Причем $\forall i$ выполняется или $\textbf{v}_i = \textbf{v}_{i-1}$ или   $\textbf{v}_i = \textbf{v}_{i+1}$. Пусть множество $\mathbf{V}$ удовлетворяет следующим свойствам:
 
-$$\left|\mathbf{V}\right| = K, \quad \forall \textbf{v} \in \mathbf{V}~\left|\textbf{v}\right| \leq T, \eqno(\ref{statment}.3)$$
+\begin{equation}
+\label{eq:st:3}
+\begin{aligned}
+\left|\mathbf{V}\right| = K, \quad \forall \textbf{v} \in \mathbf{V}~\left|\textbf{v}\right| \leq T,
+\end{aligned}
+\end{equation}
 где $\left|\mathbf{V}\right|$ мощность множества сигналов, а $\left|\textbf{v}\right|$ длина сигнала.
 
 Рассмотрим отображение:
-$$a : x \to \{1,\cdots, K\}, \eqno(\ref{statment}.4)$$
+\begin{equation}
+\label{eq:st:4}
+\begin{aligned}
+a : x \to \{1,\cdots, K\}, 
+\end{aligned}
+\end{equation}
 где $x \in \textbf{x}$ некоторая точка временного ряда.
 
 Требуется, чтобы отображение удовлетворяло следующим свойствам:
 
-$$
+\begin{equation}
+\label{eq:st:5}
+\begin{aligned}
 \begin{cases}
     a\left(x_1\right) = a\left(x_2\right), & \text{если найдется}~\textbf{v} \in \mathbf{V}: x_1,x_2 \in \textbf{v}\\
     a\left(x_1\right) \not= a\left(x_2\right), & \text{если не найдется}~\textbf{v} \in \mathbf{V}: x_1,x_2 \in \textbf{v}
 \end{cases}
-$$
+\end{aligned}
+\end{equation}
 
 Пусть задана некоторая асессорская разметка временного ряда:
-$$\textbf{y} \in \{1,\cdots,K\}^{N}. \eqno(\ref{statment}.5)$$
+\begin{equation}
+\label{eq:st:6}
+\begin{aligned}
+\textbf{y} \in \{1,\cdots,K\}^{N}.
+\end{aligned}
+\end{equation}
 
 Тогда ошибка, которую совершает алгоритм $a$ на временном ряде $\textbf{x}$ представляется в следующем виде:
-$$S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)], \eqno(\ref{statment}.6)$$
+\begin{equation}
+\label{eq:st:7}
+\begin{aligned}
+S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)],
+\end{aligned}
+\end{equation}
 где $x_i$ --- точки временного ряда,  $y_i$ асессорская разметка временного ряда.
 
-\section{Кластеризация точек}\label{solution}
+\section{Кластеризация точек}
 Рассматривается фазовая траектория временного ряда $\textbf{x}$:
-$$\mathbf{H} = \{\textbf{h}_t| \textbf{h}_t = [x_{t-T}, x_{t-T+1}, \cdots, x_{t}],~T\leq t\leq N\}. \eqno(\ref{solution}.1)$$
+\begin{equation}
+\label{eq:cl:1}
+\begin{aligned}
+\mathbf{H} = \{\textbf{h}_t| \textbf{h}_t = [x_{t-T}, x_{t-T+1}, \cdots, x_{t}],~T\leq t\leq N\}.
+\end{aligned}
+\end{equation}
 
 Фазовая траектория разбивается на фазовые подпространства из $2T$ векторов:
-$$\mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [h_{t-2T}, h_{t-2T+1}, \cdots, h_{t}],~2T\leq t\leq N\}. \eqno(\ref{solution}.1)$$
+\begin{equation}
+\label{eq:cl:2}
+\begin{aligned}
+\mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [h_{t-T}, h_{t-T+1}, \cdots, h_{t+T-1}],~T\leq t\leq N-T\},
+\end{aligned}
+\end{equation}
+полученное подпространство имеет всю локальную информацию об временном ряде, так-как содержит всю информацию на периоде до момента времени $t$ и информацию на периоде после момента времени $t$.
 
-{\bf Утверждение:}
-Размерность $2T$ фазового подпространства является достаточным для построения локальной аппроксимирующей модели.
-
-Каждое $T\text{-мерное }$ пространство $\textbf{s}_t$ проектируется на подпространство значительно меньшей размерности при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получим представление базисных векторов $\textbf{W}_t$, а также собственные числа, которые соответствуют данным базисным векторам каждого подпространства $\textbf{s}_t$ в $T\text{-мерном}$ пространстве:
-$$\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\textbf{w}^1_t, \textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\}, \eqno(\ref{solution}.3)$$
+Каждое $T\text{-мерное }$ подпространство $\textbf{s}_t$ проектируется на подпространство значительно меньшей размерности при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получим представление базисных векторов $\textbf{W}_t$, а также собственные числа, которые соответствуют данным базисным векторам каждого подпространства $\textbf{s}_t$ в $T\text{-мерном}$ пространстве:
+\begin{equation}
+\label{eq:cl:3}
+\begin{aligned}
+\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\textbf{w}^1_t, \textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},
+\end{aligned}
+\end{equation}
 где $[\textbf{w}^1_t, \textbf{w}^2_t]$ и $[\lambda^1_t, \lambda^2_t]$ это базисные векторы и соответствующие им собственные числа плоскости построенной при помощи метода главных компонент для подпространстве $\textbf{s}_t$.
 
-Рассмотрим расстояние между элементами $\mathbf{W}$:
+Рассмотрим функцию расстояние между элементами $\mathbf{W}$:
+\begin{equation}
+\label{eq:cl:4}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} h_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} h_{2}\left(\textbf{e}_1\right)\right),
+\end{aligned}
+\end{equation}
+где  $\textbf{e}_i$ это базисный вектор пространства $\textbf{W}_i$, $h_i\left(\textbf{e}\right)$ является расстоянием от вектора $\textbf{e}$ до пространства $\textbf{W}_i$.
 
-$$\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max_{\{\textbf{a},\textbf{b},\textbf{c}\} \subset \textbf{W}_1\cup \textbf{W}_2 } V\left(\textbf{a},\textbf{b},\textbf{c}\right), \eqno(\ref{solution}.4)$$
-где $V\left(\textbf{a},\textbf{b},\textbf{c}\right)$ --- объем паралелепипеда построенного на векторах $\textbf{a}, \textbf{b}, \textbf{c}$.
+Функция расстояния~(\ref{eq:cl:4}) является метрикой, доказательство этого факта представлено в приложении \ref{ProofTheorem1}. В случае, когда подпространства $\textbf{W}_t$ имеет размерность два, тогда $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ имеет следующую интерпретацию:
 
-{\bf Утверждение:}
-$\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой, если дополнительно указать, что базисы соответсвующие параллельным плоскостям не различимы.\\
+\begin{equation}
+\label{eq:cl:5}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max_{\{\textbf{a},\textbf{b},\textbf{c}\} \subset \textbf{W}_1\cup \textbf{W}_2 } V\left(\textbf{a},\textbf{b},\textbf{c}\right), 
+\end{aligned}
+\end{equation}
+где $V\left(\textbf{a},\textbf{b},\textbf{c}\right)$ --- объем параллелепипеда построенного на векторах $\textbf{a}, \textbf{b}, \textbf{c}$, которые являются базисными векторами.
+
 
 Рассмотрим расстояние между элементами $\bm{\Lambda}$:
-$$\rho\left(\bm{\lambda}_1, \bm{\lambda}_2\right) = \sqrt[]{\left(\bm{\lambda}_1 - \bm{\lambda}_2\right)^{\mathsf{T}}\left(\bm{\lambda}_1 - \bm{\lambda}_2\right)}. \eqno(\ref{solution}.5)$$
+\begin{equation}
+\label{eq:cl:6}
+\begin{aligned}
+\rho\left(\bm{\lambda}_1, \bm{\lambda}_2\right) = \sqrt[]{\left(\bm{\lambda}_1 - \bm{\lambda}_2\right)^{\mathsf{T}}\left(\bm{\lambda}_1 - \bm{\lambda}_2\right)}.
+\end{aligned}
+\end{equation}
 
 $\rho\left(\bm{\lambda}_1, \bm{\lambda}_2\right)$ является метрикой в пространстве $\mathcal{L}$.
 
 Матрица попарных расстояний между базисными векторами для временного ряда $\textbf{x}$:
-$$\textbf{M}_{\text{c}} = [0, 1]^{N\times N}. \eqno(\ref{solution}.6)$$
+\begin{equation}
+\label{eq:cl:7}
+\begin{aligned}
+\textbf{M}_{\text{c}} = [0, 1]^{N\times N}.
+\end{aligned}
+\end{equation}
 
 Матрица попарных расстояний между собственными значениями для временного ряда $\textbf{x}$:
-$$\textbf{M}_{\text{l}} = [0, 1]^{N\times N}. \eqno(\ref{solution}.7)$$
+\begin{equation}
+\label{eq:cl:8}
+\begin{aligned}
+\textbf{M}_{\text{l}} = [0, 1]^{N\times N}.
+\end{aligned}
+\end{equation}
 
-Используя выражения~(\ref{solution}.4-7) определим растояниие между двумя точками $t_1, t_2$ временного ряда:
-$$\rho\left(t_1, t_2\right) = \rho\left(\textbf{W}_1, \textbf{W}_2\right) + \rho\left(\bm{\lambda}_1, \bm{\lambda}_2\right), \quad \textbf{M} = \textbf{M}_{\text{l}} + \textbf{M}_{\text{c}}, \eqno(\ref{solution}.8)$$
-где $\rho\left(t_1, t_2\right)$ является метрикой, как сумма двух метрик. Матрица $\textbf{M}$ является матрицей попарных расстояний между двумя точками временного ряда.
+Используя выражения~(\ref{eq:cl:5}-\ref{eq:cl:8}) определим расстояние между двумя точками $t_1, t_2$ временного ряда:
+\begin{equation}
+\label{eq:cl:9}
+\begin{aligned}
+\rho\left(t_1, t_2\right) = \rho\left(\textbf{W}_1, \textbf{W}_2\right) + \rho\left(\bm{\lambda}_1, \bm{\lambda}_2\right), \quad \textbf{M} = \textbf{M}_{\text{l}} + \textbf{M}_{\text{c}},
+\end{aligned}
+\end{equation}
+где $\rho\left(t_1, t_2\right)$ является метрикой, так-как является суммой двух метрик. Матрица $\textbf{M}$ является матрицей попарных расстояний между двумя точками временного ряда.
 
 Используя матрицу попарных расстояний $\textbf{M}$ выполним кластеризацию моментов времени временного ряда, получим следующее отображение:
 
-$$a : x \to \{1,\cdots, K\}, \eqno(\ref{solution}.9)$$
+\begin{equation}
+\label{eq:cl:10}
+\begin{aligned}
+a : x \to \{1,\cdots, K\}, 
+\end{aligned}
+\end{equation}
 где $x$ некоторая точка временного ряда \textbf{x}.
 
 
-\section{Эксперимент}\label{experiment}
+\section{Эксперимент}
 Для анализа свойств предложенного алгоритма был проведен вычислительный эксперимент в котором кластеризация точек временного ряда проводилась используя матрицы попарных расстояний ~$(\ref{solution}.6-8)$.
 
 В качестве данных использовались две выборки временных рядов, которые описаны в таблице~\ref{table_1}. Выборка Physical Motion это реальные временные ряды полученные при помощи мобильного акселерометра. Синтетические временные ряды были построены при помощи нескольких первых слагаемых ряда Фурье со случайными коэффициентами из стандартного нормального распределения. Генерация данных состояла из двух этапов. На первом этапе генерировались короткие сигналы $\textbf{v}$ для построения множества $\mathbf{V}$. Вторым этапом генерации выборки $\textbf{x}$ является следующим случайным процессом:
-$$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \begin{cases}
+\begin{equation}
+\label{eq:exp:1}
+\begin{aligned}
+\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \begin{cases}
     \textbf{v}_{1} \sim \mathcal{U}\left(\mathbf{V}\right),\\
     \textbf{v}_{i} = \textbf{v}_{i - 1}, & \text{с вероятностью}~\frac{3}{4}\\
     \textbf{v}_{i} \sim \mathcal{U}\left(\mathbf{V}\right), & \text{с вероятностью}~\frac{1}{4}
-\end{cases}, \eqno(\ref{experiment}.1)$$
+\end{cases},
+\end{aligned}
+\end{equation}
 где $\mathcal{U}\left(\mathbf{V}\right)$ --- равномерное распределение на объектах из $\mathbf{V}$.
 
 \begin{table}[h]
@@ -362,7 +325,7 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 
 На рис.~\ref{fig_synthetic_series} приведен пример синтетически построенных временных рядов. На рис.~\ref{fig_synthetic_series_2} показан пример ряда в котором количество сигналов $K = 2$, а длина каждого сигнала $T = 20$. На рис.~\ref{fig_synthetic_series_3} показан пример ряда в котором количество сигналов $K = 3$, а длина каждого сигнала $T = 20$. 
 
-На рис.~\ref{fig_synthetic_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~$(\ref{solution}.8)$. Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_synthetic_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_synthetic_claster}.
+На рис.~\ref{fig_synthetic_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_synthetic_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_synthetic_claster}.
 
 \begin{figure}[h!t]\center
 \subfloat[Physical Motion 1]
@@ -406,7 +369,7 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 
 
 
-На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~$(\ref{solution}.8)$. Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
+На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
 
 
 
@@ -443,6 +406,166 @@ $$\textbf{x} = [\textbf{v}_{1}, \textbf{v}_{2}, \cdots, \textbf{v}_{M}], \quad \
 В ходе эксперимента, на реальных показаниях акселерометра, а также на синтетических данных, было показано, что предложенный метод измерение расстояния между базисами хорошо разделяет точки которые принадлежат различным классам, что приводит к хорошей кластеризации объектов. Результаты работы, показаны в таблице~\ref{table_2}.
 
 Предложеный метод имеет ряд недостаткров связаных с большим количеством ограничей на временной ряд. Данные ограничения будут ослаблены в последнующих работах.
+
+
+
+\appendix
+\section{Теорема (Грабовой 2019)}\label{ProofTheorem1}
+
+\begin{lemma} \label{lem:1} 
+Пусть заданы два подпространства $\mathbb{X}, \mathbb{Y} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1$ и  $\textbf{W}_2$, тогда справедливо следующее условие:
+
+\begin{equation}
+\label{eq:l1:1}
+\begin{aligned}
+\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right)
+\end{aligned}
+\end{equation}
+где $h_i\left(\textbf{a}\right)$ является расстоянием от вектора $\textbf{a}$ до пространства заданого базисом $\textbf{W}_i$.
+\end{lemma}
+
+\begin{proof}
+\begin{equation}
+\label{eq:l1:2}
+\begin{aligned}
+\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}\left|\textbf{a}-\sum_{i}\langle \textbf{e}^i_2, \textbf{a} \rangle\textbf{e}^i_2 \right| = \\ 
+=\max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\textbf{e}^{j}_1-\sum_{i}\langle \textbf{e}^i_2, \sum_{j}\alpha_j\textbf{e}^{j}_1 \rangle\textbf{e}^i_2 \right| =\\
+= \max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\left(\textbf{e}_3^j - \sum_{i}\langle\textbf{e}_3^j,\textbf{e}_2^i\rangle\textbf{e}_2^i\right)\right|,
+\end{aligned}
+\end{equation}
+где в выражении~(\ref{eq:l1:2}) максимум очевидно достигается на $j$-ом базисном векторе для которого выражение в скобках является максимальным.
+\end{proof}
+
+
+
+
+\begin{lemma} \label{lem:2} 
+Пусть заданы подпространства $\mathbb{X}, \mathbb{Y}, \mathbb{Z} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1, \textbf{W}_2, \textbf{W}_3$ соответственно, тогда справедливо следующее условие:
+
+\begin{equation}
+\label{eq:l2:1}
+\begin{aligned}
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq 
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
+\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
+\end{aligned}
+\end{equation}
+\end{lemma}
+
+\begin{proof} 
+\begin{equation}
+\label{eq:l2:2}
+\begin{aligned}
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}\left(||\textbf{x}-\textbf{z}|| + ||\textbf{z} - \textbf{y}||\right) = \\
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| = \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| \leq \\
+\leq \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
+\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
+\end{aligned}
+\end{equation}
+\end{proof}
+
+\begin{theorem} \label{th:1} 
+Пусть задано множество подпространств $\mathbf{W}$ пространства $\mathbb{R}^{n}$, каждое подпространство которого задается базисом, тогда функция расстояния $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве $\mathbf{W}$:
+\begin{equation}
+\label{eq:th2:1}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} h_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} h_{2}\left(\textbf{e}_1\right)\right),
+\end{aligned}
+\end{equation}
+где $\textbf{e}_i$ это базисный вектор из $\textbf{W}_i$, $h_i\left(\textbf{e}\right)$ является расстоянием от вектора $\textbf{e}$ до пространства заданого базисом $\textbf{W}_i$.
+\end{theorem}
+\begin{proof}
+Для доказательства данной теоремы, нужно показать, что функция $\rho$ удовлетворяет трем свойствам метрики.
+
+Функция $\rho$ удовлетворяет первому свойству метрики:
+\begin{equation}
+\label{eq:th2:2}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = 0 \Leftrightarrow \textbf{W}_1 = \textbf{W}_2
+\end{aligned}
+\end{equation}
+
+Функция $\rho$ удовлетворяет второму свойству метрики:
+\begin{equation}
+\label{eq:th2:3}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \rho\left(\textbf{W}_2, \textbf{W}_1\right)
+\end{aligned}
+\end{equation}
+
+Докажем, что функция $\rho$ удовлетворяет удовлетворяет неравенству треугольника:
+\begin{equation}
+\label{eq:th2:4}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) \leq \rho\left(\textbf{W}_1, \textbf{W}_3\right) + \rho\left(\textbf{W}_3, \textbf{W}_2\right)
+\end{aligned}
+\end{equation}
+
+Для доказательства неравенства треугольника докажем неравенства:
+\begin{equation}
+\label{eq:th2:5}
+\begin{aligned}
+\max_{\textbf{e}_1 \in \textbf{W}_1}h_{2}\left(\textbf{e}_1\right) \leq 
+\max_{\textbf{e}_1\in \textbf{W}_1}h_{3}\left(\textbf{e}_1\right)+
+\max_{\textbf{e}_3 \in \textbf{W}_3}h_{2}\left(\textbf{e}_3\right) \\
+\max_{\textbf{e}_2 \in \textbf{W}_2}h_{1}\left(\textbf{e}_2\right) \leq 
+\max_{\textbf{e}_2\in \textbf{W}_2}h_{3}\left(\textbf{e}_2\right)+
+\max_{\textbf{e}_3 \in \textbf{W}_3}h_{1}\left(\textbf{e}_3\right)
+\end{aligned}
+\end{equation}
+
+Используя Лемму~\ref{lem:1} доказательство неравенства (\ref{eq:th2:5}) сводится к доказательства неравенства:
+\begin{equation}
+\label{eq:th2:6}
+\begin{aligned}
+\max_{\substack{\textbf{a} \in \textbf{W}_1 \\ \left|\textbf{a}\right| \leq 1}}h_{2}\left(\textbf{a}\right) \leq 
+\max_{\substack{\textbf{a} \in \textbf{W}_1 \\ \left|\textbf{a}\right| \leq 1}}h_{3}\left(\textbf{a}\right)+
+\max_{\substack{\textbf{c} \in \textbf{W}_3 \\ \left|\textbf{c}\right| \leq 1}}h_{2}\left(\textbf{c}\right),
+\end{aligned}
+\end{equation}
+где $\textbf{a}, \textbf{c}$ произвольные элементы из соответствующих подпространств. 
+
+Подставив в выражение~(\ref{eq:th2:6}) выражение для $h_i\left(\textbf{a}\right)$, получаем следующее неравенство:
+\begin{equation}
+\label{eq:th2:7}
+\begin{aligned}
+\max_{\substack{\textbf{a} \in \textbf{W}_1 \\ \left|\textbf{a}\right| \leq 1}} \min_{\substack{\textbf{b} \in \textbf{W}_2 \\ \left|\textbf{b}\right| \leq 1}}||\textbf{a} - \textbf{b}|| \leq 
+\max_{\substack{\textbf{a} \in \textbf{W}_1 \\ \left|\textbf{a}\right| \leq 1}} \min_{\substack{\textbf{c} \in \textbf{W}_3 \\ \left|\textbf{b}\right| \leq 1}}||\textbf{a} - \textbf{c}||+
+\max_{\substack{\textbf{c} \in \textbf{W}_3 \\ \left|\textbf{c}\right| \leq 1}} \min_{\substack{\textbf{b} \in \textbf{W}_2 \\ \left|\textbf{b}\right| \leq 1}}||\textbf{c} - \textbf{b}||.
+\end{aligned}
+\end{equation}
+
+Неравенство~(\ref{eq:th2:7}) следует из Леммы~\ref{lem:2}. Из выполнения неравенства~(\ref{eq:th2:7}) следует выполнение неравенств~(\ref{eq:th2:5}).
+Докажем неравенство треугольника~(\ref{eq:th2:4}) используя неравенства~(\ref{eq:th2:5}). Для удобства введем следующие обозначения:
+\begin{equation}
+\label{eq:th2:8}
+\begin{aligned}
+\max_{\textbf{e}_i \in \textbf{W}_i} h_{\textbf{W}_j}\left(\textbf{e}_i\right) = h_{i}^{j}.
+\end{aligned}
+\end{equation}
+
+Из истинности неравенства~(\ref{eq:th2:7}) в обозначениях~(\ref{eq:th2:8}) следует истинность следующих неравенств:
+ 
+\begin{equation}
+\label{eq:th2:9}
+\begin{aligned}
+\quad h_{1}^{2} \leq h_{1}^{3} + h_{3}^{2} \leq \max\left(h_{1}^{3}, h_{3}^{1}\right) + \max\left(h_{3}^{2}, h_{2}^{3}\right)\\
+\quad h_{2}^{1} \leq h_{2}^{3} + h_{3}^{1} \leq \max\left(h_{2}^{3}, h_{3}^{2}\right) + \max\left(h_{3}^{1}, h_{1}^{3}\right)\\
+\end{aligned}
+\end{equation}
+
+Из уравнения~(\ref{eq:th2:9}) следует выполнение неравенства:
+\begin{equation}
+\label{eq:th2:10}
+\begin{aligned}
+\max\left(h_{1}^{2}, h_{2}^{1}\right) \leq  \max\left(h_{1}^{3}, h_{3}^{1}\right) + \max\left(h_{3}^{2}, h_{2}^{3}\right)\\
+\end{aligned}
+\end{equation}
+
+Доказательство неравенства~(\ref{eq:th2:10}) указывает на выполнение неравенства треугольника для функции $\rho$, что завершает доказательство того, что $\rho$ является метрикой.
+
+\end{proof}
 
 \begin{thebibliography}{99}
 	\bibitem{cinar2018}
