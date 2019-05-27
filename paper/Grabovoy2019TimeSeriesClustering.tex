@@ -3,7 +3,7 @@
 \usepackage[english,russian]{babel}
 
 \usepackage{amsthm}
-
+\usepackage{a4wide}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{amssymb}
@@ -36,9 +36,6 @@
 \newcommand*{\No}{No.}
 \begin{document}
 
-\begin{comment}
-\title{\bf Attention для апроксимации временных рядов}
-\end{comment}
 \title{\bf Анализ свойств локальных моделей в задачах кластеризации временных рядов\thanks{Работа выполнена при поддержке РФФИ и правительства РФ.}}
 \date{}
 \author{}
@@ -51,7 +48,7 @@
 \end{center}
 
 {\centering\begin{quote}
-\textbf{Аннотация:} Данная работа посвящена анализу периодических сигналов во временных рядах с целью распознавания физических действий человека с помощью акселерометра. Предлагается метод кластеризации точек временного ряда для поиска характерных сегментов временного ряда. Для построения признакового описания используется метода главных компонент для локального снижения размерности фазового пространства. Для оценки близости двух сегментов вычисляется расстояние между базисными векторами, которые получены методом главных компонент. Используя матрицу попарных расстояний между точками временного ряда выполняется кластеризация данных точек. Для анализа качества представленного алгоритма проводятся эксперименты на синтетических данных и данных полученных мобильного акселерометра.
+\textbf{Аннотация:} Данная работа посвящена анализу периодических сигналов во временных рядах с целью распознавания физических действий человека с помощью акселерометра. Предлагается метод кластеризации точек временного ряда для поиска характерных квазипериодических сегментов временного ряда. Временные ряды являются объектами сложной структуры, для которых не задано исходное признаковое описание. Для построения признакового описания используется метода главных компонент для локального снижения размерности фазового пространства. Для оценки близости двух сегментов вычисляется расстояние между базисными векторами, которые получены методом главных компонент. Используя матрицу попарных расстояний между точками временного ряда выполняется кластеризация данных точек. Для анализа качества представленного алгоритма проводятся эксперименты на синтетических данных и данных полученных при помощи мобильного акселерометра.
 
 
 \smallskip
@@ -63,18 +60,20 @@
 }
 
 \section{Введение}
-Анализ физической активности человека производится при помощи мобильных телефонов, разумных часов. Эти устройства используют акселерометр, гироскоп и магнитометр. Цель данной работы заключается в  разметке и распознавании человеческой активности во времени. %Некоторые сходства с данной задачей можно увидеть в работах по классификации временных рядов~\cite{Ignatov2015}, а также задача об обнаружении периодов активности~\cite{Olivares2012, cinar2018}.
+Анализ физической активности человека производится при помощи мобильных телефонов, разумных часов~\cite{kwapisz2010, wang2014}. Эти устройства используют акселерометр, гироскоп и магнитометр. Цель данной работы заключается в  разметке и распознавании человеческой активности во времени~\cite{Ignatov2015, Olivares2012, cinar2018}. Примерами действий служат ходьба, бег приседание, прыжки и др.
 
-Временные ряды~---~это объекты сложной структуры. При классификации которых значимую роль играет метод построения признакового пространства. Для построения используются экспертно заданные базовые функций, гипотеза порождения данных. В \cite{Ivkin2015} рассматривается комбинированное признаковое описание на основе данных методов. В \cite{Katrutsa2015} также рассматривается проблема построение признакового пространства и предлагается критерий избыточности выбранных признаков.
+Временные ряды~---~это объекты сложной структуры. При их классификации значимую роль играет построения признакового пространства. Существуют различные методы построения признакового пространства для временного ряда: метод экспертного задания порождающих функций~\cite{kwapisz2010} и метод построения признаков на основе гипотезы порождения данных~\cite{lukashin2003}. В~\cite{Ivkin2015} рассматривается комбинированное признаковое описание на основе данных методов. В~\cite{Katrutsa2015} рассматривается проблема построение признакового пространства и предлагается критерий избыточности выбранных признаков.
 \begin{figure}[h!t]\center
-\includegraphics[width=1\textwidth]{results/example}\\
-\caption{Временной ряд, с разметкой на кластеры.}
-\label{example_1}
+\subfloat[]
+{\includegraphics[width=0.6\textwidth]{results/example}\label{example:1}}
+\subfloat[]
+{\includegraphics[width=0.32\textwidth]{results/example_phase}\label{example:2}}\\
+\caption{Временной ряд, с разметкой на кластеры: a) временной ряд с ассесорской разметкой на кластеры; b) проекция фазовых подпространств на первые две главные компоненты }
 \end{figure}
 
-В данной работе объект иследованния является точка оси времени. В работе решается задача кластеризации точек временного ряда. При \textit{кластеризации} каждой точке временного ряда ставится в соответствие метка. Она соответствует сегменту временного ряда. \textit{Сегмент} это часть временного ряда, которая соответсвует одному характерному физическому действию, которое является переодическим, например: шаг, двумя ногами при ходьбе, или шаг, двумя ногами при беге. Пример сегментации показан на  рис.~\ref{example_1}. Также показан пример кластеризации временного ряда. Ряд, полученный при помощи акселерометра, разбит на два характерных физических действия.
+В данной работе объект исследования является точка оси времени. В работе решается задача кластеризации точек временного ряда. При \textit{кластеризации} каждой точке временного ряда ставится в соответствие метка. Она соответствует сегменту временного ряда. \textit{Сегмент} это часть временного ряда, которая соответсвует одному характерному физическому действию, которое является периодическим, например: шаг, двумя ногами при ходьбе, или шаг, двумя ногами при беге. Пример сегментации показан на  рис.~\ref{example:1}. Также показан пример кластеризации временного ряда. Ряд, полученный при помощи акселерометра, разбит на два характерных физических действия.
 
-Решение задачи кластеризации состоит из двух этапов. Во-первых для получения признакового описания временного ряда предлагается алгоритм локальной аппроксимации временного ряда при помощи метода главных компонент~\cite{Shiglavsi1997}. Под \textit{локальной} аппроксимацией временного ряда подразумевается, что для признакового описания его точки используется не весь ряд, а только некоторая окрестность данной точки. Во-вторых вводится метрика в новом пространстве признакового описания. После получения расстояния между точками временного ряда используется метод кластеризации KMeans~\cite{Kanungo2000}.
+Решение задачи кластеризации состоит из двух этапов. Во-первых для получения признакового описания временного ряда предлагается алгоритм локальной аппроксимации временного ряда при помощи метода главных компонент~\cite{Shiglavsi1997}. Под \textit{локальной} аппроксимацией временного ряда подразумевается, что для признакового описания его точки используется не весь ряд, а только некоторая окрестность данной точки. Во-вторых вводится метрика в новом пространстве признакового описания. После получения расстояния между точками временного ряда, выполняется кластеризация данных точек при помощи метода иерархической кластеризации.
 
 Для решения задачи кластеризации точек временного ряда вводится предположения. Предполагается, что периоды различных сегментов различаются незначительно, причем известны минимальный и максимальный периоды сегмента и количество различных сегментов внутри временного ряда. Также предполагается, что тип активности во времени не меняется часто, а также что фазовые траектории разных сегментов являются различными. 
 
@@ -82,7 +81,7 @@
 
 
 
-\section{Постановка}
+\section{Постановка задачи разметки временного ряда}
 
 Задан временной ряд
 \begin{equation}
@@ -114,10 +113,10 @@
 \begin{equation}
 \label{eq:st:4}
 \begin{aligned}
-a : x \to \{1,\cdots, K\}, 
+a : t \to \mathbb{Y} = \{1,\cdots, K\}, 
 \end{aligned}
 \end{equation}
-где $x \in \textbf{x}$ некоторая точка временного ряда.
+где $t \in \{1,\cdots, N\}$ некоторый момент времени, на котором задан временной ряд.
 
 Требуется, чтобы отображение удовлетворяло следующим свойствам:
 
@@ -125,8 +124,8 @@ a : x \to \{1,\cdots, K\},
 \label{eq:st:5}
 \begin{aligned}
 \begin{cases}
-    a\left(x_1\right) = a\left(x_2\right), & \text{если найдется}~\textbf{v} \in \mathbf{V}: x_1,x_2 \in \textbf{v}\\
-    a\left(x_1\right) \not= a\left(x_2\right), & \text{если не найдется}~\textbf{v} \in \mathbf{V}: x_1,x_2 \in \textbf{v}
+    a\left(t_1\right) = a\left(t_2\right), & \text{если найдется}~\textbf{v} \in \mathbf{V}: x_{t_1},x_{t_2} \in \textbf{v}\\
+    a\left(t_1\right) \not= a\left(t_2\right), & \text{если не найдется}~\textbf{v} \in \mathbf{V}: x_{t_1},x_{t_2} \in \textbf{v}
 \end{cases}
 \end{aligned}
 \end{equation}
@@ -142,20 +141,20 @@ a : x \to \{1,\cdots, K\},
 \begin{equation}
 \label{eq:st:7}
 \begin{aligned}
-S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)],
+S = \frac{1}{N}\sum_{t=1}^{N}[y_t = a\left(t\right)],
 \end{aligned}
 \end{equation}
-где $x_i$ --- точки временного ряда,  $y_i$ асессорская разметка временного ряда.
+где $t$ --- момент времени,  $y_t$ асессорская разметка $t$-го момента времени для заданого временного ряда.
 
 \section{Кластеризация точек}
-Построим фазовая траектория временного ряда $\textbf{x}$:
+Рассмотрим фазовую траекторию временного ряда $\textbf{x}$:
 \begin{equation}
 \label{eq:cl:1}
 \begin{aligned}
 \mathbf{H} = \{\textbf{h}_t| \textbf{h}_t = [x_{t-T}, x_{t-T+1}, \cdots, x_{t}],~T\leq t\leq N\}.
 \end{aligned}
 \end{equation}
-Фазовая траектория разбивается на фазовые подпространства из $2T$ векторов:
+Используя информацию об длине максимального сегмента внутри временного ряда, фазовая траектория разбивается на фазовые подпространства из $2T$ векторов:
 \begin{equation}
 \label{eq:cl:2}
 \begin{aligned}
@@ -164,7 +163,9 @@ S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)],
 \end{equation}
 полученное подпространство имеет всю локальную информацию об временном ряде, так как содержит всю информацию на периоде до момента времени $t$ и информацию о периоде после момента времени $t$.
 
-Каждое $T\text{-мерное }$ подпространство $\textbf{s}_t$ проектируется на подпространство значительно меньшей размерности при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получим представление базисных векторов $\textbf{W}_t$, а также собственные числа, которые соответствуют данным базисным векторам каждого подпространства $\textbf{s}_t$ в $T\text{-мерном}$ пространстве:
+В качестве признакового описания точки временного ряда рассматриваются базисные представления $\textbf{W}_t$ для  $T\text{-мерных}$ подпространств $\textbf{s}_t$. Подпространство $\textbf{s}_t$ проектируется на подпространство значительно меньшей размерности при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получаем:
+
+%Каждое $T\text{-мерное}$ подпространство $\textbf{s}_t$ проектируется на подпространство значительно меньшей размерности при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получим представление базисных векторов $\textbf{W}_t$, а также собственные числа, которые соответствуют данным базисным векторам каждого подпространства $\textbf{s}_t$ в $T\text{-мерном}$ пространстве:
 \begin{equation}
 \label{eq:cl:3}
 \begin{aligned}
@@ -182,7 +183,18 @@ S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)],
 \end{equation}
 где  $\textbf{e}_i$ это базисный вектор пространства $\textbf{W}_i$, $h_i\left(\textbf{e}\right)$ является расстоянием от вектора $\textbf{e}$ до пространства $\textbf{W}_i$.
 
-Функция расстояния~(\ref{eq:cl:4}) является метрикой, доказательство этого факта представлено в приложении \ref{ProofTheorem1}. В случае, когда подпространства $\textbf{W}_t$ имеет размерность два, тогда метрика $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ имеет следующую интерпретацию:
+\begin{theorem}\label{th:1} 
+Пусть задано множество подпространств $\mathbf{W}$ пространства $\mathbb{R}^{n}$, каждое подпространство которого задается базисом, тогда функция расстояния $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве $\mathbf{W}$:
+\begin{equation}
+\label{eq:th2:1}
+\begin{aligned}
+\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} h_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} h_{2}\left(\textbf{e}_1\right)\right),
+\end{aligned}
+\end{equation}
+где $\textbf{e}_i$ это базисный вектор из $\textbf{W}_i$, $h_i\left(\textbf{e}\right)$ является расстоянием от вектора $\textbf{e}$ до пространства заданого базисом $\textbf{W}_i$.
+\end{theorem}
+
+В силу теоремы~\ref{th:1} функция расстояния~(\ref{eq:cl:4}) является метрикой, доказательство данной теоремы представлено в приложении \ref{ProofTheorem1}. В случае, когда подпространства $\textbf{W}_t$ имеет размерность два, тогда метрика $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ имеет следующую интерпретацию:
 
 \begin{equation}
 \label{eq:cl:5}
@@ -227,15 +239,15 @@ S = \frac{1}{N}\sum_{i=1}^{N}[y_i = a\left(x_i\right)],
 \end{equation}
 где $\rho\left(t_1, t_2\right)$ является метрикой, так-как является суммой двух метрик. Матрица $\textbf{M}$ является матрицей попарных расстояний между двумя парами точек временного ряда $\textbf{x}$.
 
-Используя матрицу попарных расстояний $\textbf{M}$ выполним кластеризацию моментов времени временного ряда, получим следующее отображение:
+Используя матрицу попарных расстояний $\textbf{M}$ выполняется кластеризация моментов времени временного ряда:
 
 \begin{equation}
 \label{eq:cl:10}
 \begin{aligned}
-a : x \to \{1,\cdots, K\}, 
+a : t \to \{1,\cdots, K\}, 
 \end{aligned}
 \end{equation}
-где $x$ некоторая точка временного ряда \textbf{x}.
+где $t$ некоторый момент времени временного ряда \textbf{x}.
 
 
 \section{Эксперимент}
@@ -256,7 +268,7 @@ a : x \to \{1,\cdots, K\},
 
 \begin{table}[h!t]
 \begin{center}
-\caption{Описание выборок}
+\caption{Описание временных рядов}
 \label{table_1}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -266,7 +278,7 @@ a : x \to \{1,\cdots, K\},
 	& 900& 2& 30\\
 	\hline
 	\multicolumn{1}{|l|}{Physical Motion 2}
-	& 1000& 2& 30\\
+	& 900& 2& 30\\
 	\hline
 	\multicolumn{1}{|l|}{Synthetic 1}
 	& 2000& 2& 20\\
@@ -280,38 +292,38 @@ a : x \to \{1,\cdots, K\},
 \end{table}
 
 \begin{figure}[h!t]\center
-\subfloat[Synthetic 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_series}\label{fig_synthetic_series_2}}
-\subfloat[Synthetic 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/3_patern_series}\label{fig_synthetic_series_3}}\\
-\caption{Пример синтетически построенных временных рядов}
+\caption{Пример синтетически построенных временных рядов: a) для временного ряда Synthetic 1; b) для временного ряда Synthetic 2}
 \label{fig_synthetic_series}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Synthetic 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_full}}
-\subfloat[Synthetic 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/3_patern_full}}\\
-\caption{Матрица попарных расстояний $\textbf{M}$ между точками временного ряда}
+\caption{Матрица попарных расстояний $\textbf{M}$ между точками временного ряда: a) для временного ряда Synthetic 1; b) для временного ряда Synthetic 2}
 \label{fig_synthetic_distance}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Synthetic 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_2D_vector}}
-\subfloat[Synthetic 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/3_patern_2D_vector}}\\
-\caption{Проекция точек временного ряда на плоскость при помощи матрицы попарных расстояний $\textbf{M}$}
+\caption{Проекция точек временного ряда на плоскость при помощи матрицы попарных расстояний $\textbf{M}$: a) для временного ряда Synthetic 1; b) для временного ряда Synthetic 2}
 \label{fig_synthetic_2D}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Synthetic 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_patern_claster_vector}}
-\subfloat[Synthetic 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/3_patern_claster_vector}}\\
-\caption{Кластеризация точек временного ряда}
+\caption{Кластеризация точек временного ряда: a) для временного ряда Synthetic 1; b) для временного ряда Synthetic 2}
 \label{fig_synthetic_claster}
 \end{figure}
 
@@ -319,43 +331,43 @@ a : x \to \{1,\cdots, K\},
 \paragraph{Синтетические данные.}
 
 
-На рис.~\ref{fig_synthetic_series} приведен пример синтетически построенных временных рядов. На рис.~\ref{fig_synthetic_series_2} показан пример ряда в котором количество различных сегментов $K = 2$, а длина каждого сегмента $T = 20$. На рис.~\ref{fig_synthetic_series_3} показан пример ряда в котором количество различных сегментов $K = 3$, а длина каждого сегмента $T = 20$. 
+На рис.~\ref{fig_synthetic_series} приведен пример синтетических временных рядов. На рис.~\ref{fig_synthetic_series_2} показан пример ряда в котором количество различных сегментов $K = 2$, а длина каждого сегмента $T = 20$. На рис.~\ref{fig_synthetic_series_3} показан пример ряда в котором количество различных сегментов $K = 3$, а длина каждого сегмента $T = 20$. 
 
-На рис.~\ref{fig_synthetic_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_synthetic_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_synthetic_claster}.
+На рис.~\ref{fig_synthetic_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_synthetic_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода иерархической кластеризации. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_synthetic_claster}.
 
 \begin{figure}[h!t]\center
-\subfloat[Physical Motion 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/1_real_series}}
-\subfloat[Physical Motion 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_real_series}}\\
-\caption{Пример синтетически построенных временных рядов}
+\caption{Пример синтетически построенных временных рядов: a) для временного ряда Physical Motion 1; b) для временного ряда Physical Motion 2}
 \label{fig_real_series}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Physical Motion 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/1_real_full}}
-\subfloat[Physical Motion 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_real_full}}\\
-\caption{Матрица попарных расстояний $\textbf{M}$ между точками временного ряда}
+\caption{Матрица попарных расстояний $\textbf{M}$ между точками временного ряда: a) для временного ряда Physical Motion 1; b) для временного ряда Physical Motion 2}
 \label{fig_real_distance}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Physical Motion 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/1_real_2D_vector}}
-\subfloat[Physical Motion 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_real_2D_vector}}\\
-\caption{Проекция точек временного на плоскость при помощи матрицы попарных расстояний $\textbf{M}$}
+\caption{Проекция точек временного на плоскость при помощи матрицы попарных расстояний $\textbf{M}$: a) для временного ряда Physical Motion 1; b) для временного ряда Physical Motion 2}
 \label{fig_real_2D}
 \end{figure}
 
 \begin{figure}[h!t]\center
-\subfloat[Physical Motion 1]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/1_real_claster_vector}}
-\subfloat[Physical Motion 2]
+\subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_real_claster_vector}}\\
-\caption{Кластеризация точек временного ряда}
+\caption{Кластеризация точек временного ряда: a) для временного ряда Physical Motion 1; b) для временного ряда Physical Motion 2}
 \label{fig_real_claster}
 \end{figure}
 
@@ -365,7 +377,7 @@ a : x \to \{1,\cdots, K\},
 
 
 
-На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуальзуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода KMeans~\cite{Kanungo2000}. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
+На рис.~\ref{fig_real_distance} проиллюстрированы матрицы попарных расстояний $\textbf{M}$ между построены при помощи формулы~(\ref{eq:cl:9}). Используя матрицу попарных расстояний и метод Multidimensional Scaling~\cite{Borg2005} визуализируем точки временного ряда на плоскости. На рис.~\ref{fig_real_2D} показана визуализация точек на плоскости и выполнена их кластеризация при помощи метода иерархической кластеризации. Иллюстрация кластеров точек временного ряда продемонстрирована на рис.~\ref{fig_real_claster}.
 
 
 
@@ -406,62 +418,9 @@ a : x \to \{1,\cdots, K\},
 
 
 \appendix
+\setcounter{theorem}{0}
 \section{Теорема (Грабовой 2019)}\label{ProofTheorem1}
-
-\begin{lemma} \label{lem:1} 
-Пусть заданы два подпространства $\mathbb{X}, \mathbb{Y} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1$ и  $\textbf{W}_2$, тогда справедливо следующее условие:
-
-\begin{equation}
-\label{eq:l1:1}
-\begin{aligned}
-\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right)
-\end{aligned}
-\end{equation}
-где $h_i\left(\textbf{a}\right)$ является расстоянием от вектора $\textbf{a}$ до пространства заданого базисом $\textbf{W}_i$.
-\end{lemma}
-
-\begin{proof}
-\begin{equation}
-\label{eq:l1:2}
-\begin{aligned}
-\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}\left|\textbf{a}-\sum_{i}\langle \textbf{e}^i_2, \textbf{a} \rangle\textbf{e}^i_2 \right| = \\ 
-=\max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\textbf{e}^{j}_1-\sum_{i}\langle \textbf{e}^i_2, \sum_{j}\alpha_j\textbf{e}^{j}_1 \rangle\textbf{e}^i_2 \right| =\\
-= \max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\left(\textbf{e}_3^j - \sum_{i}\langle\textbf{e}_3^j,\textbf{e}_2^i\rangle\textbf{e}_2^i\right)\right|,
-\end{aligned}
-\end{equation}
-где в выражении~(\ref{eq:l1:2}) максимум очевидно достигается на $j$-ом базисном векторе для которого выражение в скобках является максимальным.
-\end{proof}
-
-
-
-
-\begin{lemma} \label{lem:2} 
-Пусть заданы подпространства $\mathbb{X}, \mathbb{Y}, \mathbb{Z} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1, \textbf{W}_2, \textbf{W}_3$ соответственно, тогда справедливо следующее условие:
-
-\begin{equation}
-\label{eq:l2:1}
-\begin{aligned}
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq 
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
-\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
-\end{aligned}
-\end{equation}
-\end{lemma}
-
-\begin{proof} 
-\begin{equation}
-\label{eq:l2:2}
-\begin{aligned}
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}\left(||\textbf{x}-\textbf{z}|| + ||\textbf{z} - \textbf{y}||\right) = \\
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| = \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| \leq \\
-\leq \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
-\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
-\end{aligned}
-\end{equation}
-\end{proof}
-
-\begin{theorem} \label{th:1} 
+\begin{theorem}\label{th:1} 
 Пусть задано множество подпространств $\mathbf{W}$ пространства $\mathbb{R}^{n}$, каждое подпространство которого задается базисом, тогда функция расстояния $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве $\mathbf{W}$:
 \begin{equation}
 \label{eq:th2:1}
@@ -563,9 +522,76 @@ a : x \to \{1,\cdots, K\},
 
 \end{proof}
 
+
+\begin{lemma} \label{lem:1} 
+Пусть заданы два подпространства $\mathbb{X}, \mathbb{Y} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1$ и  $\textbf{W}_2$, тогда справедливо следующее условие:
+
+\begin{equation}
+\label{eq:l1:1}
+\begin{aligned}
+\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right)
+\end{aligned}
+\end{equation}
+где $h_i\left(\textbf{a}\right)$ является расстоянием от вектора $\textbf{a}$ до пространства заданого базисом $\textbf{W}_i$.
+\end{lemma}
+
+\begin{proof}
+\begin{equation}
+\begin{aligned}
+\max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}\left|\textbf{a}-\sum_{i}\langle \textbf{e}^i_2, \textbf{a} \rangle\textbf{e}^i_2 \right| = \\ 
+=\max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\textbf{e}^{j}_1-\sum_{i}\langle \textbf{e}^i_2, \sum_{j}\alpha_j\textbf{e}^{j}_1 \rangle\textbf{e}^i_2 \right| =\\
+= \max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\left(\textbf{e}_3^j - \sum_{i}\langle\textbf{e}_3^j,\textbf{e}_2^i\rangle\textbf{e}_2^i\right)\right|,
+\end{aligned}
+\end{equation}
+где в выражении~(\ref{eq:l1:2}) максимум очевидно достигается на $j$-ом базисном векторе для которого выражение в скобках является максимальным.
+\end{proof}
+
+
+
+
+\begin{lemma} \label{lem:2} 
+Пусть заданы подпространства $\mathbb{X}, \mathbb{Y}, \mathbb{Z} \subset \mathbb{R}^{n}$, которые задаются базисами $\textbf{W}_1, \textbf{W}_2, \textbf{W}_3$ соответственно, тогда справедливо следующее условие:
+
+\begin{equation}
+\label{eq:l2:1}
+\begin{aligned}
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq 
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
+\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
+\end{aligned}
+\end{equation}
+\end{lemma}
+
+\begin{proof} 
+\begin{equation}
+\label{eq:l2:2}
+\begin{aligned}
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}\left(||\textbf{x}-\textbf{z}|| + ||\textbf{z} - \textbf{y}||\right) = \\
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| = \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + \min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z} - \textbf{y}|| \leq \\
+\leq \max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\textbf{x}\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
+\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\textbf{z}\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\textbf{y}\right|\leq 1}}||\textbf{z}-\textbf{y}||.
+\end{aligned}
+\end{equation}
+\end{proof}
 \begin{thebibliography}{99}
+	\bibitem{kwapisz2010}
+	\textit{J. R. Kwapisz, G. M. Weiss, S. A. Moore} Activity Recognition using Cell Phone Accelerometers~// Proceedings of the Fourth International Workshop on Knowledge Discovery from Sensor Data, 2010. Vol. 12. P. 74--82.
+	
+	\bibitem{wang2014}
+	\textit{W. Wang, H. Liu, L. Yu, F. Sun} Activity Recognition using Cell Phone Accelerometers~// Joint Conference on Neural Networks, 2014. P. 1185--1190.
+	
+	\bibitem{Ignatov2015}
+	\textit{A. D. Ignatov, V. V. Strijov} Human activity recognition using quasiperiodic time series collected from a single tri-axial accelerometer.~// Multimedial Tools and Applications, 2015.
+	
+	\bibitem{Olivares2012}
+	\textit{A. Olivares, J. Ramirez, J. M. Gorris, G. Olivares, M. Damas} Detec- tion of (in)activity periods in human body motion using inertial sensors: A comparative study.~// Sensors, 12(5):5791–5814, 2012.
+	
 	\bibitem{cinar2018}
 	\textit{Y. G. Cinar and H. Mirisaee} Period-aware content attention RNNs for time series forecasting with missing values~// Neurocomputing, 2018. Vol. 312. P. 177--186.
+	
+	\bibitem{lukashin2003}
+	\textit{Y. P. Lukashin} Adaptive methods for short-term forecasting~// Finansy and Statistik, 2003.
 	
 	\bibitem{Ivkin2015}
 	\textit{И. П. Ивкин,  М. П. Кузнецов} Алгоритм классификации временных рядов акселерометра по комбинированному признаковому описанию.~// Машинное обучение и анализ данных, 2015.
@@ -576,17 +602,12 @@ a : x \to \{1,\cdots, K\},
 	\bibitem{Borg2005}
 	\textit{I. Borg, P. J. F. Groenen} Modern Multidimensional Scaling. --- New York: Springer, 2005. 540 p.
 	
-	\bibitem{Kanungo2000}
-	\textit{T. Kanungo, D. M. Mount et al} An Efficient k-Means Clustering Algorithm: Analysis and Implementation. 2000.
+	%\bibitem{Kanungo2000}
+	%\textit{T. Kanungo, D. M. Mount et al} An Efficient k-Means Clustering Algorithm: Analysis and Implementation. 2000.
 	
 	\bibitem{Shiglavsi1997}
 	\textit{Д. Л. Данилова, А. А. Жигловский} Главные компоненты временных рядов: метод "Гусеница". --- Санкт-Петербурскиий университет, 1997.
 	
-	\bibitem{Ignatov2015}
-	\textit{A. D. Ignatov, V. V. Strijov} Human activity recognition using quasiperiodic time series collected from a single tri-axial accelerometer.~// Multimedial Tools and Applications, 2015.
-	
-	\bibitem{Olivares2012}
-	\textit{A. Olivares, J. Ramirez, J. M. Gorris, G. Olivares, M. Damas} Detec- tion of (in)activity periods in human body motion using inertial sensors: A comparative study.~// Sensors, 12(5):5791–5814, 2012.
 
 	
 \end{thebibliography}
