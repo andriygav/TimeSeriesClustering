@@ -183,10 +183,9 @@ S = \frac{1}{N}\sum_{t=1}^{N}[y_t = a\left(t\right)],
 \end{equation}
 где  $\textbf{e}_i$ это базисный вектор пространства $\textbf{W}_i$, $h_i\left(\textbf{e}\right)$ является расстоянием от вектора $\textbf{e}$ до пространства $\textbf{W}_i$.
 
-\begin{theorem}\label{th:1} 
-Пусть задано множество подпространств $\mathbf{W}$ пространства $\mathbb{R}^{n}$, каждое подпространство которого задается базисом, тогда функция расстояния $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве $\mathbf{W}$:
+\begin{theorem}
+Пусть задано множество подпространств $\mathbb{W}$ пространства $\mathbb{R}^{n}$, каждое подпространство которого задается базисом, тогда функция расстояния $\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве $\mathbf{W}$:
 \begin{equation}
-\label{eq:th2:1}
 \begin{aligned}
 \rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} h_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} h_{2}\left(\textbf{e}_1\right)\right),
 \end{aligned}
@@ -367,7 +366,8 @@ a : t \to \{1,\cdots, K\},
 {\includegraphics[width=0.5\textwidth]{results/1_real_claster_vector}}
 \subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/2_real_claster_vector}}\\
-\caption{Кластеризация точек временного ряда: a) для временного ряда Physical~Motion~1; b) для временного ряда Physical~Motion~2}
+\caption{Кластеризация точек временного ряда: 
+a) для временного ряда Physical~Motion~1; b) для временного ряда Physical~Motion~2}
 \label{fig_real_claster}
 \end{figure}
 
@@ -537,6 +537,7 @@ a : t \to \{1,\cdots, K\},
 
 \begin{proof}
 \begin{equation}
+\label{eq:l1:2}
 \begin{aligned}
 \max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}h_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\textbf{a}\right|\leq 1}\left|\textbf{a}-\sum_{i}\langle \textbf{e}^i_2, \textbf{a} \rangle\textbf{e}^i_2 \right| = \\ 
 =\max_{\{\alpha_j\}_{j}:~\sum\alpha_j^2\leq 1}\left|\sum_{j}\alpha_j\textbf{e}^{j}_1-\sum_{i}\langle \textbf{e}^i_2, \sum_{j}\alpha_j\textbf{e}^{j}_1 \rangle\textbf{e}^i_2 \right| =\\
