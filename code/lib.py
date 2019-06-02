@@ -182,4 +182,87 @@ def get_pairwise_matrix(List_of_basis_vector, List_of_basis_vector_s, List_of_ba
     return full_dist
 
 
+def find_points(points, line_point):
+    """
+    points have a shape [N x 2]
+    line_point has a shape [2 x 1]
+    """
+    List_of_points_plus = []
+    List_of_points_minus = []
+    
+    List_of_t_plus = []
+    List_of_t_minus = []
+    
+    for i in range(len(points) - 1):
+        if (line_point[1]*points[i][0] - line_point[0]*points[i][1] < 0) and(line_point[1]*points[i+1][0] - line_point[0]*points[i+1][1] > 0):
+            List_of_points_plus.append(points[i])
+            List_of_t_plus.append(i)
+        if (line_point[1]*points[i][0] - line_point[0]*points[i][1] > 0) and(line_point[1]*points[i+1][0] - line_point[0]*points[i+1][1] < 0):
+            List_of_points_minus.append(points[i])
+            List_of_t_minus.append(i)
+    
+    return np.array(List_of_points_plus), np.array(List_of_points_minus), np.array(List_of_t_plus), np.array(List_of_t_minus)
+
+def find_distance(points, line_point):
+    """
+    points have a shape [N x 2]
+    line_point has a shape [2 x 1]
+    """
+    
+    sum_distance = 0
+    
+    normal = np.array([line_point[1], -line_point[0]])
+    normal = normal/np.sqrt((normal*normal).sum())
+    
+    for p in points:
+        sum_distance += ((normal*p).sum())
+    
+    
+    return sum_distance
+
+def find_segment(X, T):
+    phase_track = return_phase_track(X, T)
+    model = PCA(n_components=2)
+
+    ress = model.fit_transform(phase_track)
+    
+    ress[:, 0] = ress[:, 0]/np.sqrt(((ress[:, 0]**2).mean()))
+
+    ress[:, 1] = ress[:, 1]/np.sqrt(((ress[:, 1]**2).mean()))
+
+    Phi = np.linspace(-np.pi, np.pi, 200)
+
+    All_List = np.array(list(map(lambda phi: find_points(ress, np.array([np.sin(phi), np.cos(phi)])), Phi)))
+
+    List_of_std = []
+    for l, phi in zip(All_List, Phi):
+        List_of_std.append(find_distance(np.vstack([l[0], l[1]]), np.array([np.sin(phi), np.cos(phi)])))
+
+    List_of_std = np.array(List_of_std)
+    
+    phi = Phi[np.argmin(List_of_std)]
+    
+    
+    line_point = np.array([np.sin(phi), np.cos(phi)])
+
+    List_of_points_plus, List_of_points_minus, List_of_t_plus, List_of_t_minus = find_points(ress, line_point)
+    
+    return List_of_points_plus, List_of_points_minus, List_of_t_plus, List_of_t_minus, line_point, ress
+    
+    
+def segmentation(X_all, prediction_vector, T):
+    List_of_point = []
+    List_of_All = []
+    for t in np.unique(prediction_vector):
+        ind = np.where(prediction_vector == t)[0]
+
+        X = X_all[:, ind, :]
+        List_of_t = np.arange(0, X.shape[1], 1)
+
+        List_of_points_plus, List_of_points_minus, List_of_t_plus, List_of_t_minus, line_point, ress = find_segment(X, T)
+
+        List_of_All.append([X, List_of_t, List_of_points_plus, List_of_points_minus, List_of_t_plus, List_of_t_minus, line_point, ress])
+        List_of_point.append((np.where(prediction_vector == t)[0])[List_of_t_minus])
+
+    return List_of_All, List_of_point
 
