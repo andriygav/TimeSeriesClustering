@@ -1,5 +1,6 @@
 \documentclass[10pt,pdf,hyperref={unicode}]{beamer}
 \beamertemplatenavigationsymbolsempty
+
 \setbeamertemplate{blocks}[rounded=true, shadow=true]
 \setbeamertemplate{footline}[page number]
 \usepackage{multicol}
@@ -29,11 +30,15 @@
 \usecolortheme{sidebartab}
 \definecolor{beamer@blendedblue}{RGB}{31,96,49}
 
+\setbeamertemplate{enumerate items}[circle]
+
+\setbeamersize{text margin left=1.5em, text margin right=1.5em}
+
 %----------------------------------------------------------------------------------------------------------
 \title[\hbox to 56mm{Анализ свойств локальных моделей... \hfill\insertframenumber\,/\,\inserttotalframenumber}]
 {Анализ свойств локальных моделей в задачах кластеризации квазипериодических временных рядов}
-\author[Грабовой А. В.]{\large Грабовой Андрей Валериевич}
-\institute{\large Московский физико-технический институт\\
+\author[Грабовой А. В.]{\Large Грабовой Андрей Валериевич}
+\institute{ Московский физико-технический институт\\
 Факультет управления и прикладной математики\\
 Кафедра интеллектуальных систем\\
 ~\\
@@ -75,46 +80,34 @@
 \end{frame}
 
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Илюстрация задачи}
-
-
-\begin{columns}
-    \begin{column}{0.6\textwidth}
-        \includegraphics[width=1\textwidth]{results/example}
-    \end{column}
-    \begin{column}{0.6\textwidth}
-        \includegraphics[width=1\textwidth]{results/example_phase}
-    \end{column}
-\end{columns}
-
-Временной ряд, с разметкой на кластеры: временной ряд с ассесорской разметкой на кластеры и выделением начала квазипериодического сегмента; проекция фазовых траекторий на первые две главные компоненты
-
-\end{frame}
-
-%----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Постановка задачи}
 
 \begin{center}
-	\includegraphics[width=0.6\textwidth]{results/example_slides}
+	\begin{columns}
+   		 \begin{column}{0.7\textwidth}
+        			\includegraphics[width=1\textwidth]{results/example_slides}
+			
+			 Задан временной ряд: $$\textbf{x}~\in~\mathbb{R}^{\text{N}},~\quad~\textbf{x}~=~[\textbf{v}_1,~\cdots, \textbf{v}_M],~\quad~\textbf{v}_i~\in~\mathcal{V},$$\\ где $\mathcal{V}$ множество возможных сегментов в ряде $\textbf{x}$.
+   		 \end{column}
+   		 \begin{column}{0.55\textwidth}
+        			\includegraphics[width=1\textwidth]{results/example_phase}
+			
+			Проекция фазовых траекторий на первые две главные компоненты.
+    		\end{column}
+	\end{columns}
 \end{center}
 
- Задан временной ряд:\\
-        $\textbf{x} \in \mathbb{R}^{\text{N}}, \quad \textbf{x} = [\textbf{v}_1, \cdots, \textbf{v}_M], \quad \textbf{v}_i \in \mathcal{V},$\\
-        где $\mathcal{V}$ множество возможных сегментов в ряде $\textbf{x}$.
-
-~\\
 Предположения:
 \begin{itemize}
-	\item $\left|\mathcal{V}\right| = K$,
-	\item $\textbf{v} \in \mathcal{V}~\left|\textbf{v}\right| \leq T$,
-	\item для всех~$i$ либо~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ либо~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  является цепочкой действий,
+	\item число различных действий внутри временного ряда известно и равно~$K$,
+	\item для всех~$\textbf{v} \in \mathcal{V}$ выполняется~$\left|\textbf{v}\right| \leq T$, где~$\left|\textbf{v}\right|$ длина сегмента,
+	\item для всех~$i$ либо~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ либо~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  является цепочкой действий.
 \end{itemize}
-где $\left|\mathcal{V}\right|$ мощность множества сигналов, а $\left|\textbf{v}\right|$ длина сигнала.
 
 \end{frame}
 
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Постановка задачи}
+\begin{frame}[shrink=5]{Постановка задачи кластеризации точек}
 
 Рассматривается отображение
 $$
@@ -130,11 +123,11 @@ $$
 \end{cases}
 $$
 
-Пусть задана некоторая асессорская разметка временного ряда:
+Пусть задана асессорская разметка точек временного ряда:
 $$
 \textbf{y} \in \{1,\cdots,K\}^{N}.
 $$
-Тогда ошибка алгоритма~$a$ на временном ряде~$\textbf{x}$ представляется в следующем виде:
+Ошибка алгоритма~$a$ на временном ряде~$\textbf{x}$:
 $$
 S = \frac{1}{N}\sum_{t=1}^{N}[y_t = a\left(t\right)],
 $$
@@ -154,27 +147,53 @@ $$\mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [\textbf{h}_{t-T}, \textbf{h}_{t-T
 
 ~\\
 Множество базисов:
-$$\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\lambda^1_t\textbf{w}^1_t, \lambda^2_t\textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},$$
+$$\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\textbf{w}^1_t, \textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},$$
 где~$[\textbf{w}^1_t, \textbf{w}^2_t]$ и~$[\lambda^1_t, \lambda^2_t]$ это базисные векторы и соответствующие им собственные числа для сегмента фазовой траектории~$\textbf{s}_t$.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Кластеризация точек}
+\begin{frame}[shrink=5]{Функция расстояния (общий случай)}
 Расстояние между элементами~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$:\\
 $$\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} d_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} d_{2}\left(\textbf{e}_1\right)\right),$$
 где ~$\textbf{e}_i$ это базисный вектор пространства~$\textbf{W}_i,$ а~$d_i\left(\textbf{e}\right)$ является расстоянием от вектора~$\textbf{e}$ до пространства~$\textbf{W}_i$.
 
-\begin{theorem}
-Пусть задано множество подпространств~$\mathbb{W}$ пространства~$\mathbb{R}^{n}$. Каждое подпространство которого задается базисом~$\mathbf{W}_i\in \mathbf{W}$, тогда функция расстояния~$\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве базисов~$\mathbf{W}$:
+\begin{block}{Теорема (Грабовой 2019)}
+\textit{Пусть задано множество подпространств~$\mathbb{W}$ пространства~$\mathbb{R}^{n}$. Каждое подпространство которого задается базисом~$\mathbf{W}_i\in \mathbf{W}$, тогда функция расстояния~$\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве базисов~$\mathbf{W}$:
 $$
 \rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} d_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} d_{2}\left(\textbf{e}_1\right)\right),
 $$
 где~$\textbf{e}_i$ это базисный вектор из~$\textbf{W}_i$, a~$d_i\left(\textbf{e}\right)$ является расстоянием от вектора~$\textbf{e}$ до пространства заданого базисом~$\textbf{W}_i$.
-\end{theorem}
+}
+\end{block}
+\end{frame}
+
+%----------------------------------------------------------------------------------------------------------
+\begin{frame}[shrink=5]{Функция расстояния (вспомогательные леммы)}
+
+\begin{block}{Лемма 1 (Грабовой 2019)}
+\textit{Пусть заданы два подпространства~$\mathbb{X}, \mathbb{Y} \subset \mathbb{R}^{n}$, которые задаются базисами~$\textbf{W}_1$ и~$\textbf{W}_2$, тогда справедливо следующее условие:}
+
+$$
+\max_{\textbf{a} \in \mathbb{X}:~\left|\left|\textbf{a}\right|\right|\leq 1}d_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\left|\textbf{a}\right|\right|= 1}d_2\left(\textbf{a}\right)
+$$
+\textit{где~$d_i\left(\textbf{a}\right)$ является расстоянием от вектора~$\textbf{a}$ до пространства заданого базисом~$\textbf{W}_i$.
+}
+\end{block}
+
+\begin{block}{Лемма 2 (Грабовой 2019)}
+\textit{Пусть заданы подпространства~$\mathbb{X}, \mathbb{Y}, \mathbb{Z} \subset \mathbb{R}^{n}$, которые задаются базисами~$\textbf{W}_1, \textbf{W}_2, \textbf{W}_3$ соответственно, тогда справедливо следующее условие:}
+
+$$
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\left|\textbf{x}\right|\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\left|\textbf{y}\right|\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq 
+\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\left|\textbf{x}\right|\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\left|\textbf{z}\right|\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
+\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\left|\textbf{z}\right|\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\left|\textbf{y}\right|\right|\leq 1}}||\textbf{z}-\textbf{y}||.
+$$
+\end{block}
+
 \end{frame}
 
 %----------------------------------------------------------------------------------------------------------
 
-\begin{frame}[shrink=5]{Кластеризация точек}
+\begin{frame}[shrink=5]{Функция расстояния (двумерный случай)}
 Расстояние между элементами~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$:\\
 $$
 \rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max_{\{\textbf{a},\textbf{b},\textbf{c}\} \subset \textbf{W}_1\cup \textbf{W}_2 } V\left(\textbf{a},\textbf{b},\textbf{c}\right), 
@@ -201,34 +220,40 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 %----------------------------------------------------------------------------------------------------------
 
 
-\begin{frame}{Описание временных рядов в эксперименте}
+\begin{frame}[shrink=5]{Описание временных рядов в эксперименте}
 
-\begin{tabular}{|c|c|c|c|}
+\begin{itemize}
+	\item Physical Motion --- реальные временные ряды, которые получены при помощи мобильного акселерометра.  
+	
+	Характерные действия: ходьба, бег, приседания.
+	\item Synthetic --- синтетические временные ряды, которые были построены при помощи нескольких первых слагаемых ряда Фурье со случайными коэффициентами из стандартного нормального распределения. 
+\end{itemize}
+
+~\\
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-	Ряд,~$\textbf{x}$&Точек,~$N$&Сегментов,~$K$&Период,~$T$\\
+	Ряд,~$\textbf{x}$ &Длина,~$N$& Сегментов,~$K$&Длина,~$T$& Ошибка,~$S$\\
 	\hline
-	\multicolumn{1}{|l|}{Physical~Motion~1}
-	& 900& 2& 40\\
+	\multicolumn{1}{|l|}{Phys.~Motion~1}
+	& 900& 2& 40& 0.06\\
 	\hline
-	\multicolumn{1}{|l|}{Physical~Motion~2}
-	& 900& 2& 40\\
+	\multicolumn{1}{|l|}{Phys.~Motion~2}
+	& 900& 2& 40& 0.03\\
 	\hline
 	\multicolumn{1}{|l|}{Synthetic~1}
-	& 2000& 2& 20\\
+	& 2000& 2& 20& 0.04\\
 	\hline
 	\multicolumn{1}{|l|}{Synthetic~2}
-	& 2000& 3& 20\\
-	\hline
-	\multicolumn{1}{|l|}{Simple~1}
-	& 1000& 2& 100\\
+	& 2000& 3& 20& 0.03\\
 \hline
-
 \end{tabular}
 
+~\\
 \begin{itemize}
 	\item $N$ --- число точек во временном ряде,
 	\item $K$ --- число различных действий во временном ряде,
-	\item $T$ --- максимальная длина сегмента.
+	\item $T$ --- максимальная длина сегмента,
+	\item $S$ --- точность кластеризации.
 \end{itemize}
 
 \end{frame}
@@ -329,35 +354,7 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Результаты работы алгоритма кластеризации}
 
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-	Ряд,~$\textbf{x}$ &Длина,~$N$& Сегментов,~$K$&Длина,~$T$& Ошибка,~$S$\\
-	\hline
-	\multicolumn{1}{|l|}{Phys.~Motion~1}
-	& 900& 2& 40& 0.06\\
-	\hline
-	\multicolumn{1}{|l|}{Phys.~Motion~2}
-	& 900& 2& 40& 0.03\\
-	\hline
-	\multicolumn{1}{|l|}{Synthetic~1}
-	& 2000& 2& 20& 0.04\\
-	\hline
-	\multicolumn{1}{|l|}{Synthetic~2}
-	& 2000& 3& 20& 0.03\\
-\hline
-\end{tabular}
-
-\begin{itemize}
-	\item $N$ --- число точек во временном ряде,
-	\item $K$ --- число различных действий во временном ряде,
-	\item $T$ --- максимальная длина сегмента,
-	\item $S$ --- точность кластеризации.
-\end{itemize}
-
-\end{frame}
-%----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Сегментация временных рядов}
 
 \begin{columns}
@@ -383,26 +380,24 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 
-\begin{frame}[shrink=5]{Заключение}
-	\begin{itemize}
+\begin{frame}[shrink=5]{Выносится на защиту}
+	\begin{enumerate}
 		\item Предложен алгоритм поиска характерных сегментов, который основывается на методе главных компонент для локального снижения размерности
 		\item Введена функция расстояния между локальными базисами в каждый момент времени, которые интерпретировались как признаковое описание точки временного ряда. Данная функция является метрикой.
 		\item В ходе эксперимента, на реальных показаниях акселерометра, а также на синтетических данных, было показано, что предложенный метод измерение расстояния между базисами хорошо разделяет точки которые принадлежат различным действиям, что приводит к хорошей кластеризации объектов.
 		\item Также в эксперименте была проведена полная сегментация временных рядов для каждого кластера по отдельности.
-	\end{itemize}
+	\end{enumerate}
 	
-	\begin{itemize}
-		\item Планируется решить задачу нахождения минимального размера фазового пространства, для которого  фазовая траектория не имеет самопересечений.
-	\end{itemize}
+	Планируется решить задачу нахождения минимального размера фазового пространства, для которого  фазовая траектория не имеет самопересечений.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Публикации}
-	\begin{itemize}
+	\begin{enumerate}
 		\item \textit{Грабовой А. В., Стрижов В. В.} Анализ свойств локальных моделей в задачах кластеризации квазипериодических временных рядов // (в процессе)
 		\item \textit{Грабовой А. В., Бахтеев О. Ю., Стрижов В. В.} Определение релевантности параметров нейросети // Информатика и ее применения, 2019, 13(2).
 		\item \textit{Гадаев Т. Т., Грабовой А. В., Мотренко А. П., Стрижов В. В.} Численные методы оценки объема выборки в задачах регрессии и классификации //(в процессе)
 		\item \textit{Бучнев Т. Т., Грабовой А. В., Гадаев Т. Т., Стрижов В. В.} Ранее прогнозирование достаточного объема выборки для обобщенно линейной модели // (в процессе)
-	\end{itemize}
+	\end{enumerate}
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 
