@@ -15,6 +15,8 @@
 \usepackage{subfig}
 \usepackage{amsmath, bm}
 
+\usepackage{comment}
+
 \usepackage{tabularx}
 
 \usepackage{tikz}
@@ -34,9 +36,11 @@
 
 \setbeamersize{text margin left=1.5em, text margin right=1.5em}
 
+\usepackage{ragged2e}
+
 %----------------------------------------------------------------------------------------------------------
-\title[\hbox to 56mm{Анализ свойств локальных моделей... \hfill\insertframenumber\,/\,\inserttotalframenumber}]
-{Анализ свойств локальных моделей в задачах кластеризации квазипериодических временных рядов}
+\title[\hbox to 56mm{Кластеризация точек временных рядов \hfill\insertframenumber\,/\,\inserttotalframenumber}]
+{Анализ свойств локальных моделей в задачах кластеризации точек квазипериодических временных рядов}
 \author[Грабовой А. В.]{\Large Грабовой Андрей Валериевич}
 \institute{ Московский физико-технический институт\\
 Факультет управления и прикладной математики\\
@@ -53,41 +57,60 @@
 \begin{frame}
 \titlepage
 \end{frame}
+
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Цель работы}
-	\begin{block}{Исследуется}
-		Исследуется задача поиска характерных переодических структур внетри временного ряда.
-	\end{block}
-	
-	\begin{block}{Требуется}
-		Требуется предложить алгоритм поиска характерных сегментов, который основывается на методе главных компонент для локального снижения размерности.
-	\end{block}
-	
-	\begin{block}{Проблемы}
-		Построение признакового описания точек временного ряда низкой размерности.
-	\end{block}
+\begin{frame}[shrink=5]{Задача кластеризации точек временного ряда}
+\justifying
+\textbf{Цель:} предложить алгоритм поиска характерных квазипериодических сегментов внутри временного ряда.
+
+~\\
+\textbf{Задачи}
+
+\begin{enumerate}
+\justifying
+	\item Предложить признаковое описание точек временного ряда.
+	\item Предложить функцию расстояния между точками временного ряда в новом признаковом описании, для их дальнейшей кластеризации.
+\end{enumerate}
+
+~\\
+\textbf{Исследуемые проблемы}
+\begin{enumerate}
+\justifying
+	\item Построение адекватного признакового описания точек временного ряда низкой размерности.
+\end{enumerate}
+
+~\\
+\textbf{Методы решения}
+
+	Алгоритм поиска характерных сегментов основывается на методе главных компонент для локального снижения размерности сегмента фазовой траектории в окрестности каждой точки временного ряда. Главные компоненты рассматриваются как признаковое описания точек временного ряда.
 	
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Список литературы}
 	\begin{itemize}
-		\item \textit{И. П. Ивкин,  М. П. Кузнецов} Алгоритм классификации временных рядов акселерометра по комбинированному признаковому описанию.~// Машинное обучение и анализ данных, 2015.
-		\item \textit{V. V. Strijov, A. M. Katrutsa} Stresstes procedures for features selection algorithms.~// Schemometrics and Intelligent Laboratory System, 2015.
-		\item	\textit{A. D. Ignatov, V. V. Strijov} Human activity recognition using quasiperiodic time series collected from a single tri-axial accelerometer.~// Multimedial Tools and Applications, 2015.
-		\item \textit{I. Borg, P. J. F. Groenen} Modern Multidimensional Scaling. --- New York: Springer, 2005. 540 p.
-		\item \textit{Д. Л. Данилова, А. А. Жигловский} Главные компоненты временных рядов: метод "Гусеница". --- СПбУ, 1997.
+	\justifying
+		\item \textit{A. P. Motrenko, V. V. Strijov} Extracting fundamental periods to segment biomedical signals~// Journal of Biomedical and Health Informatics, 2015,~20(6). P.~1466--1476.
+		
+		\item \textit{Y. G. Cinar and H. Mirisaee} Period-aware content attention RNNs for time series forecasting with missing values~// Neurocomputing,~2018. Vol.~312. P.~177--186.
+		
+		\item	\textit{A. D. Ignatov, V. V. Strijov} Human activity recognition using quasiperiodic time series collected from a single tri-axial accelerometer.~// Multimedial Tools and Applications,~2015.
+		
+		\item \textit{A. Olivares, J. Ramirez, J. M. Gorris, G. Olivares, M. Damas} Detection of (in)activity periods in human body motion using inertial sensors: A~comparative study.~// Sensors, 12(5):5791--5814,~2012.
+		
+		\item \textit{Д. Л. Данилова, А. А. Жигловский} Главные компоненты временных рядов: метод "Гусеница".~---~СПбУ, 1997.
+		
 	\end{itemize}
 \end{frame}
 
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Постановка задачи}
+\begin{frame}[shrink=5]{Постановка задачи кластеризации точек}
 
 \begin{center}
 	\begin{columns}
    		 \begin{column}{0.7\textwidth}
         			\includegraphics[width=1\textwidth]{results/example_slides}
 			
-			 Задан временной ряд: $$\textbf{x}~\in~\mathbb{R}^{\text{N}},~\quad~\textbf{x}~=~[\textbf{v}_1,~\cdots, \textbf{v}_M],~\quad~\textbf{v}_i~\in~\mathcal{V},$$\\ где $\mathcal{V}$ множество возможных сегментов в ряде $\textbf{x}$.
+			 Задан временной ряд $$\textbf{x}~\in~\mathbb{R}^{\text{N}},~\quad~\textbf{x}~=~[\textbf{v}_1,~\cdots, \textbf{v}_M],~\quad~\textbf{v}_i~\in~\mathcal{V},$$\\ где $\mathcal{V}$ множество сегментов в ряде $\textbf{x}$.
    		 \end{column}
    		 \begin{column}{0.55\textwidth}
         			\includegraphics[width=1\textwidth]{results/example_phase}
@@ -108,21 +131,22 @@
 
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Постановка задачи кластеризации точек}
+\justifying
 
-Рассматривается отображение
+Строится отображение
 $$
 a : t \to \mathbb{Y} = \{1,\cdots, K\}, 
 $$
 где~$t \in \{1,\cdots, N\}$ некоторый момент времени, на котором задан временной ряд.
 Требуется, чтобы отображение~$a$ удовлетворяло следующим свойствам:
-
 $$
 \begin{cases}
-    a\left(t_1\right) = a\left(t_2\right), &  \text{если в моменты } t_1, t_2 \text{ совершается один тип действий}\\
-    a\left(t_1\right) \not= a\left(t_2\right), &  \text{если в моменты } t_1, t_2 \text{ совершаются разные типы действий }
+    a\left(t_1\right) = a\left(t_2\right), &  \text{если в моменты } t_1, t_2 \text{ совершается один тип действий},\\
+    a\left(t_1\right) \not= a\left(t_2\right), &  \text{если в моменты } t_1, t_2 \text{ совершаются разные типы действий}.
 \end{cases}
 $$
 
+~\\
 Пусть задана асессорская разметка точек временного ряда:
 $$
 \textbf{y} \in \{1,\cdots,K\}^{N}.
@@ -135,70 +159,43 @@ $$
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Кластеризация точек}
+\begin{frame}[shrink=5]{Построение признакового описания точек}
+\justifying
+
 Фазовая траектория ряда $\textbf{x}$:
 $$\mathbf{H} = \{\textbf{h}_t| \textbf{h}_t = [x_{t-T}, x_{t-T+1}, \cdots, x_{t}],~T\leq t\leq N\},$$
 где $\textbf{h}_t$~---~точка фазовой траектории.
 
 ~\\
-Фазовые подпространства:
-$$\mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [\textbf{h}_{t-T}, \textbf{h}_{t-T+1}, \cdots, \textbf{h}_{t+T-1}],~T\leq t\leq N-T\},$$
-где $\textbf{s}_t$~---~это сегмент фазовой траектории.
+Множество сегментов фазовой траектории:
+$$\mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [\textbf{h}_{t-T}, \textbf{h}_{t-T+1}, \cdots, \textbf{h}_{t+T-1}],~2T\leq t\leq N-T\},$$
+где $\textbf{s}_t$~---~это сегмент фазовой траектории в окрестности момента времени $t$.
 
 ~\\
-Множество базисов:
+Множество базисов, полученных методом главных компонент для каждого сегмента фазовой траектории:
 $$\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\textbf{w}^1_t, \textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},$$
-где~$[\textbf{w}^1_t, \textbf{w}^2_t]$ и~$[\lambda^1_t, \lambda^2_t]$ это базисные векторы и соответствующие им собственные числа для сегмента фазовой траектории~$\textbf{s}_t$.
+где~$[\textbf{w}^1_t, \textbf{w}^2_t]$ и~$[\lambda^1_t, \lambda^2_t]$ это базисные векторы и соответствующие им собственные числа для сегмента фазовой траектории~$\textbf{s}_t$. Далее~$\textbf{W}_t$  и $\bm{\lambda}_t$ рассматриваются как признаковое описанием момента времени $t$.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Функция расстояния (общий случай)}
-Расстояние между элементами~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$:\\
-$$\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} d_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} d_{2}\left(\textbf{e}_1\right)\right),$$
+\begin{frame}{Функция расстояния (общий случай)}
+\justifying
+
+Для кластеризации точек временного ряда, вводится расстояние в предложенном признаковом описании данного ряда. Расстояние между элементами~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$:\\
+$$\rho\left(\textbf{W}_{t_1}, \textbf{W}_{t_2}\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_{t_2}} d_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_{t_1}} d_{2}\left(\textbf{e}_1\right)\right),$$
 где ~$\textbf{e}_i$ это базисный вектор пространства~$\textbf{W}_i,$ а~$d_i\left(\textbf{e}\right)$ является расстоянием от вектора~$\textbf{e}$ до пространства~$\textbf{W}_i$.
 
-\begin{block}{Теорема (Грабовой 2019)}
-\textit{Пусть задано множество подпространств~$\mathbb{W}$ пространства~$\mathbb{R}^{n}$. Каждое подпространство которого задается базисом~$\mathbf{W}_i\in \mathbf{W}$, тогда функция расстояния~$\rho\left(\textbf{W}_1, \textbf{W}_2\right)$ является метрикой заданой на множестве базисов~$\mathbf{W}$:
-$$
-\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max\left(\max_{\textbf{e}_2 \in \textbf{W}_2} d_{1}\left(\textbf{e}_2\right), \max_{\textbf{e}_1 \in \textbf{W}_1} d_{2}\left(\textbf{e}_1\right)\right),
-$$
-где~$\textbf{e}_i$ это базисный вектор из~$\textbf{W}_i$, a~$d_i\left(\textbf{e}\right)$ является расстоянием от вектора~$\textbf{e}$ до пространства заданого базисом~$\textbf{W}_i$.
-}
-\end{block}
-\end{frame}
-
-%----------------------------------------------------------------------------------------------------------
-\begin{frame}[shrink=5]{Функция расстояния (вспомогательные леммы)}
-
-\begin{block}{Лемма 1 (Грабовой 2019)}
-\textit{Пусть заданы два подпространства~$\mathbb{X}, \mathbb{Y} \subset \mathbb{R}^{n}$, которые задаются базисами~$\textbf{W}_1$ и~$\textbf{W}_2$, тогда справедливо следующее условие:}
-
-$$
-\max_{\textbf{a} \in \mathbb{X}:~\left|\left|\textbf{a}\right|\right|\leq 1}d_2\left(\textbf{a}\right) = \max_{\textbf{a} \in \mathbb{X}:~\left|\left|\textbf{a}\right|\right|= 1}d_2\left(\textbf{a}\right)
-$$
-\textit{где~$d_i\left(\textbf{a}\right)$ является расстоянием от вектора~$\textbf{a}$ до пространства заданого базисом~$\textbf{W}_i$.
-}
-\end{block}
-
-\begin{block}{Лемма 2 (Грабовой 2019)}
-\textit{Пусть заданы подпространства~$\mathbb{X}, \mathbb{Y}, \mathbb{Z} \subset \mathbb{R}^{n}$, которые задаются базисами~$\textbf{W}_1, \textbf{W}_2, \textbf{W}_3$ соответственно, тогда справедливо следующее условие:}
-
-$$
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\left|\textbf{x}\right|\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\left|\textbf{y}\right|\right|\leq 1}}||\textbf{x}-\textbf{y}||\leq 
-\max_{\substack{\textbf{x} \in \mathbb{X} \\ \left|\left|\textbf{x}\right|\right|\leq 1}}\min_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\left|\textbf{z}\right|\right|\leq 1}}||\textbf{x}-\textbf{z}|| + 
-\max_{\substack{\textbf{z} \in \mathbb{Z} \\ \left|\left|\textbf{z}\right|\right|\leq 1}}\min_{\substack{\textbf{y} \in \mathbb{Y} \\ \left|\left|\textbf{y}\right|\right|\leq 1}}||\textbf{z}-\textbf{y}||.
-$$
-\end{block}
 
 \end{frame}
 
 %----------------------------------------------------------------------------------------------------------
 
 \begin{frame}[shrink=5]{Функция расстояния (двумерный случай)}
+\justifying
 Расстояние между элементами~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$:\\
 $$
-\rho\left(\textbf{W}_1, \textbf{W}_2\right) = \max_{\{\textbf{a},\textbf{b},\textbf{c}\} \subset \textbf{W}_1\cup \textbf{W}_2 } V\left(\textbf{a},\textbf{b},\textbf{c}\right), 
+\rho\left(\textbf{W}_{t_1}, \textbf{W}_{t_2}\right) = \max_{\{\textbf{a},\textbf{b},\textbf{c}\} \subset \textbf{W}_{t_1}\cup \textbf{W}_{t_2} } V\left(\textbf{a},\textbf{b},\textbf{c}\right), 
 $$
-где~$\textbf{W}_1\cup\textbf{W}_2$ это объединение базисных векторов первого и второго пространства,~$V\left(\textbf{a},\textbf{b},\textbf{c}\right)$~---~объем параллелепипеда построенного на векторах~$\textbf{a}, \textbf{b}, \textbf{c}$, которые являются столбцами матрицы~$\textbf{W}_1\cup\textbf{W}_2$.
+где~$\textbf{W}_{t_1}\cup\textbf{W}_{t_2}$ это объединение базисных векторов первого и второго пространства,~$V\left(\textbf{a},\textbf{b},\textbf{c}\right)$~---~объем параллелепипеда построенного на векторах~$\textbf{a},$ $\textbf{b},$ $\textbf{c},$ которые являются столбцами матрицы~$\textbf{W}_{t_1}\cup\textbf{W}_{t_2}$.
 
 ~\\
 Расстояние между элементами $\mathcal{L}$:\\
@@ -223,6 +220,7 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 \begin{frame}[shrink=5]{Описание временных рядов в эксперименте}
 
 \begin{itemize}
+\justifying
 	\item Physical Motion --- реальные временные ряды, которые получены при помощи мобильного акселерометра.  
 	
 	Характерные действия: ходьба, бег, приседания.
@@ -259,6 +257,7 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Пример временных рядов}
+\justifying
 
 \begin{columns}
     \begin{column}{0.5\textwidth}
@@ -278,11 +277,13 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
     \end{column}
 \end{columns}
 
+~\\
 Временные ряды построенные синтетически, а также при помощи мобильного акселерометра.
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Матрица попарных расстояний $\textbf{M}$}
+\justifying
 
 \begin{columns}
     \begin{column}{0.35\textwidth}
@@ -302,11 +303,13 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
     \end{column}
 \end{columns}
 
+~\\
 Матрицы попарных расстояний для временных рядов, построенных синтетически, а также при помощи мобильного акселерометра.
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Проекция точек фазовой траектории на плоскость}
+\justifying
 
 \begin{columns}
     \begin{column}{0.35\textwidth}
@@ -331,6 +334,7 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}[shrink=5]{Кластеризация точек временного ряда}
+\justifying
 
 \begin{columns}
     \begin{column}{0.5\textwidth}
@@ -350,19 +354,21 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
     \end{column}
 \end{columns}
 
+~\\
 Результат кластеризации точек временных рядов, построенных синтетически, а также при помощи мобильного акселерометра.
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 
 \begin{frame}[shrink=5]{Сегментация временных рядов}
+\justifying
 
 \begin{columns}
     \begin{column}{0.5\textwidth}
-        \includegraphics[width=1\textwidth]{results/simple_1_claster_vector}
+        \includegraphics[width=1\textwidth]{results/simple_1_segmentation_vector}
     \end{column}
     \begin{column}{0.3\textwidth}
-        \includegraphics[width=1\textwidth]{results/simple_1_phase_space0}
+        \includegraphics[width=1\textwidth]{results/simple_1_phase_space1}
     \end{column}
 \end{columns}
 
@@ -375,13 +381,17 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
     \end{column}
 \end{columns}
 
+~\\
 Результат сегментации временных рядов, в случае двух синусоидальных сигналов в произвольной частотой и амплитудой, а также в случае реальных данных, полученных при помощи акселерометра.
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 
-\begin{frame}[shrink=5]{Выносится на защиту}
+\begin{frame}[shrink=0]{Выносится на защиту}
+\justifying
+
 	\begin{enumerate}
+	\justifying
 		\item Предложен алгоритм поиска характерных сегментов, который основывается на методе главных компонент для локального снижения размерности
 		\item Введена функция расстояния между локальными базисами в каждый момент времени, которые интерпретировались как признаковое описание точки временного ряда. Данная функция является метрикой.
 		\item В ходе эксперимента, на реальных показаниях акселерометра, а также на синтетических данных, было показано, что предложенный метод измерение расстояния между базисами хорошо разделяет точки которые принадлежат различным действиям, что приводит к хорошей кластеризации объектов.
@@ -391,13 +401,23 @@ $$\textbf{M} = \mathbb{R}_{+}^{N\times N}.$$
 	Планируется решить задачу нахождения минимального размера фазового пространства, для которого  фазовая траектория не имеет самопересечений.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Публикации}
+\begin{frame}{Публикации и выступления}
+\justifying
 	\begin{enumerate}
-		\item \textit{Грабовой А. В., Стрижов В. В.} Анализ свойств локальных моделей в задачах кластеризации квазипериодических временных рядов // (в процессе)
-		\item \textit{Грабовой А. В., Бахтеев О. Ю., Стрижов В. В.} Определение релевантности параметров нейросети // Информатика и ее применения, 2019, 13(2).
-		\item \textit{Гадаев Т. Т., Грабовой А. В., Мотренко А. П., Стрижов В. В.} Численные методы оценки объема выборки в задачах регрессии и классификации //(в процессе)
-		\item \textit{Бучнев Т. Т., Грабовой А. В., Гадаев Т. Т., Стрижов В. В.} Ранее прогнозирование достаточного объема выборки для обобщенно линейной модели // (в процессе)
+	\justifying
+		\item \textit{Грабовой А. В., Стрижов В. В.} Анализ свойств локальных моделей в задачах кластеризации квазипериодических временных рядов~// (в~процессе)
+		\item \textit{Грабовой А. В., Бахтеев О. Ю., Стрижов В. В.} Определение релевантности параметров нейросети // Информатика и ее применения,~2019,~13(2).
+		\item \textit{Гадаев Т. Т., Грабовой А. В., Мотренко А. П., Стрижов В. В.} Численные методы оценки объема выборки в задачах регрессии и классификации~// (в~процессе)
+		\item \textit{Бучнев Т. Т., Грабовой А. В., Гадаев Т. Т., Стрижов В. В.} Ранее прогнозирование достаточного объема выборки для обобщенно линейной модели~// (в~процессе)
 	\end{enumerate}
+	
+	\begin{enumerate}
+	\justifying
+		\item 12 октября 2018. ИОИ-2018. Автоматическое определение релевантности параметров нейросети.
+		\item 29 ноября 2019. 61-я Всероссийская научная конференция МФТИ. Поиск оптимальной модели при помощи алгоритмов прореживания.
+	\end{enumerate}
+	
+	
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 
