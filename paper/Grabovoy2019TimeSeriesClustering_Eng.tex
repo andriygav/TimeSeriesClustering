@@ -77,7 +77,7 @@ Current work considers an sequences  that consist of at least two consecutive se
 {\includegraphics[width=0.5\textwidth]{results/example}\label{example:1}}
 \subfloat[]
 {\includegraphics[width=0.5\textwidth]{results/example_phase}\label{example:2}}\\
-\caption{A time series with clustering:  a) time series with assessor markings on clusters and markings at beginning of each quasi-periodic segment; b) projection of phase trajectories on the first two principal components}
+\caption{A time series with clustering:  a) time series with assessor markings on clusters and markings at beginning of each quasi-periodic segment; b) projection of phase trajectories on the two principal components}
 \end{figure}
 
 Time series are objects of complex structure. 
@@ -123,42 +123,74 @@ A synthetic data constructed by using the sum of the first few terms of the Four
 Real data was received by using a mobile accelerometer, which took readings during exercise of a person.
 
 \section{Literature analysis}
+The paper~\cite{kwapisz2010} describes a method for constructing a feature description based on expertly defined generating functions.
+The article~\cite{lukashin2003} proposes a method for constructing features based on the data generation hypothesis.
+A combined feature description is introduced in the paper~\cite{Ivkin2015} based on these methods.
+The paper~\cite{Katrutsa2015} consider the problem of construction a feature space. The article proposes a criterion for the redundancy of the selected features.
 
-\section{Statement}
-A time series
+The Article\cite{motrenko2015} is the closest to our research.
+The article searches for the beginning of a segment within a quasiperiodic signal, which consists of only one chain of actions.
+This method is based on the study of the phase space, namely, the search for a stable hyperplane that divides the phase space into two equal parts.
+The points that are close to this hyperplane are selected as the beginning and ending of the segment.
+The article~\cite{motrenko2015} proposes to project the phase space into two principal components, after which the beginning of each segment should be highlighted.
+This method finds the beginning of a segment in the case when the time series consists of one type of signal.
+
+The paper~\cite{cinar2018} is also close to our research. 
+The article proposes a method for searching for a periodic structure in a series by using the LSTM model with attention mechanism.
+This method has the same disadvantage as the previous method~\cite{motrenko2015}. This method finds the beginning of a segment in the case when the time series consists of one type of signal.
+
+
+\section{Time series clustering problem}
+
+There given a time series
 \begin{equation}
 \label{eq:st:1}
 \begin{aligned}
 \textbf{x} \in \mathbb{R}^{N},
 \end{aligned}
 \end{equation}
-where~$N$ is a number of points in the time series. The time series consists of a sequence of segments:
+where~$N$ is a number of samples in the time series. The time series consists of a sequence of segments,
 \begin{equation}
 \label{eq:st:2}
 \begin{aligned}
 \textbf{x} = [\textbf{v}_1, \textbf{v}_2, \cdots, \textbf{v}_M],
 \end{aligned}
 \end{equation}
-where~$\textbf{v}_i$ is a segment from the set of segments~$\mathbf{V}$, which are observed in the time series $\textbf{x}$. 
-For all~$i$ either the~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ or the~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  is a  chain of action. Let the set of segments~$\mathbf{V}$ satisfies the following properties:
+where~$\textbf{v}_i$ is a segment from the set of segments~$\mathbf{V}$. It is supposed that the time series $\textbf{x}$ contains any $\textbf{v}_i$ from $\textbf{V}$.
+%which are observed in the time series $\textbf{x}$. 
+For all~$i$ either~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ or~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  is a  chain of action. The fig.~\ref{example_stat:1} shows an example of segments $\textbf{v}_i$.
+Each segments $\textbf{v}_{i}$ has no more than $T$ elements, $\left|\textbf{v}_{i}\right| \leq T$. The set $V$ has $K$ different types of segments, $\left|\mathbf{V}\right| = K$. The fig.~\ref{example_stat:1} shows an example of segments, which are constructed the chain of action~$[\textbf{v}_{i-1}, \textbf{v}_{i}, \textbf{v}_{i+1}]$.
 
-\begin{equation}
-\label{eq:st:3}
-\begin{aligned}
-\left|\mathbf{V}\right| = K, \quad \textbf{v} \in \mathbf{V}~\left|\textbf{v}\right| \leq T,
-\end{aligned}
-\end{equation}
-where~$\left|\mathbf{V}\right|$ is a number of different action in the set of segments $\mathbf{V},$~$\left|\textbf{v}\right|$ is a length of segment,~$K$ is a number of different action in the time series $\textbf{x}$ and~$T$ is a length of maximum segment.
+The figure shows an example of $ 1 $, $ 2 $ segments that belong to segments of the same type.
 
-Consider the mapping
+%Let the set of segments~$\mathbf{V}$ satisfies the following properties:
+
+%\begin{equation}
+%\label{eq:st:3}
+%\begin{aligned}
+%\left|\mathbf{V}\right| = K, \quad \textbf{v} \in \mathbf{V}~\left|\textbf{v}\right| \leq T,
+%\end{aligned}
+%\end{equation}
+%where~$\left|\mathbf{V}\right|$ is a number of different action in the set of segments $\mathbf{V},$~$\left|\textbf{v}\right|$ is a length of segment,~$K$ is a number of different action in the time series $\textbf{x}$ and~$T$ is a length of maximum segment.
+
+\begin{figure}[h!t]\center
+\subfloat[]
+{\includegraphics[width=0.5\textwidth]{results/example_stat}\label{example_stat:1}}
+\subfloat[]
+{\includegraphics[width=0.5\textwidth]{results/example_phase_stat}\label{example_stat:2}}\\
+\caption{A time series and example of local information of points:  a) time series example of local information of time point~$t = 90$; b) projection of phase trajectories on the two principal components and example of segment~$\textbf{s}_t$ in time point~$t = 90$}
+\label{example_stat:0}
+\end{figure}
+
+Construct the mapping
 \begin{equation}
 \label{eq:st:4}
 \begin{aligned}
 a : t \to \mathbb{Y} = \{1,\cdots, K\}, 
 \end{aligned}
 \end{equation}
-where~$t \in \{1,\cdots, N\}$ is a point of time in which the time series is defined.
-Let the mapping~$a$ satisfy the following properties:
+where~$t \in \{1,\cdots, N\}$ is a point in the time line which defines the time series $\textbf{x}$.
+Let the map~$a$ satisfy the following properties:
 
 \begin{equation}
 \label{eq:st:5}
@@ -170,14 +202,15 @@ Let the mapping~$a$ satisfy the following properties:
 \end{aligned}
 \end{equation}
 
-Consider following markup of the time series points:
+Each point~$t$ corresponds to a label~$y_t$ from the set $\mathbb{Y} =  \{1,\cdots,K\}$:
+%Consider following markup of the time series points:
 \begin{equation}
 \label{eq:st:6}
 \begin{aligned}
-\textbf{y} \in \{1,\cdots,K\}^{N}.
+\textbf{y} \in \mathbb{Y}^{N}.
 \end{aligned}
 \end{equation}
-The algorithm error for the time series can be calculated by the following formula:
+The error for the time series is
 
 \begin{equation}
 \label{eq:st:7}
@@ -185,45 +218,46 @@ The algorithm error for the time series can be calculated by the following formu
 S = \frac{1}{N}\sum_{t=1}^{N}[y_t = a\left(t\right)],
 \end{aligned}
 \end{equation}
-where~$t$~---~is a point of time,~$y_t$ is a markup in the point of time~$t$ for time series~$\textbf{x}$.
+where~$t$ is a point of time,~$y_t$ is its label corresponds to a point in time~$t$ for time series~$\textbf{x}$.
 
 
-\section{Points clustering}
-Consider the phase trajectory of the time series~$\textbf{x}$:
+\section{Time series samples clustering}
+Construct the phase trajectory~$\mathbf{H}$ with the time series~$\textbf{x}$:
 \begin{equation}
 \label{eq:cl:1}
 \begin{aligned}
 \mathbf{H} = \{\textbf{h}_t| \textbf{h}_t = [x_{t-T}, x_{t-T+1}, \cdots, x_{t}],~T\leq t\leq N\},
 \end{aligned}
 \end{equation}
-where $\textbf{h}_t$ is a phase trajectory point.
+where $\textbf{h}_t$ is a point in the phase trajectory.
 
-Information about the length of the maximum segment in the time series allows us to split the phase trajectory into segments.
+%Information about the length of the maximum segment in the time series allows us to split the phase trajectory into segments.
+Split the phase trajectory into segments by using the maximum length of segments:
 \begin{equation}
 \label{eq:cl:2}
 \begin{aligned}
 \mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [\textbf{h}_{t-T}, \textbf{h}_{t-T+1}, \cdots, \textbf{h}_{t+T-1}],~T\leq t\leq N-T\},
 \end{aligned}
 \end{equation}
-where $\textbf{s}_t$ is a segment of phase trajectory. Segments have all local information about the time series, as it contains all the information on the period up to some time point~$t$ and information about the period after the time point~$t$.
+where $\textbf{s}_t$ is a segment of phase trajectory. The fig.~\ref{example_stat:2} shows an example of a phase trajectory segment. The segments have all local information about the time series, as it contains all the information on the period up to some time point~$t$ and information about the period after the time point~$t$.
 
 
 
 %В качестве признакового описания точки временного ряда $t$ рассматриваются главные компоненты~$\textbf{W}_t$ для~$T\text{-мерных}$ сегментов~$\textbf{s}_t$. Сегмент~$\textbf{s}_t$ проекцируется на подпространство размерности два при помощи метода главных  компонент~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$. Получаем:
 
-The principal components~$\textbf{W}_t$ for~$T\text{-dimensional}$ segments~$\textbf{s}_t$ are considered as a features description of a point~$t$ in a time series. The segment~$\textbf{s}_t $ is projected onto a subspace of dimension two by using the principal component method~$\textbf{z}_t~=~\textbf{W}_t\textbf{s}_t$:
+The principal components~$\textbf{W}_t$ for~$T\text{-dimensional}$ segments~$\textbf{s}_t$ are considered as a feature description of a point~$t$ in a time series. The segment~$\textbf{s}_t $ is projected onto subspace with two dimension by using the principal component method~$\textbf{z}_t~=~\hat{\textbf{W}}_t\textbf{s}_t$:
 
 \begin{equation}
 \label{eq:cl:3}
 \begin{aligned}
-\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\lambda^1_t\textbf{w}^1_t, \lambda^2_t\textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},
+\mathbf{W} = \{\textbf{W}_t| \textbf{W}_t = [\textbf{w}^1_t, \textbf{w}^2_t]\}, \quad \hat{\mathbf{W}} = \{\hat{\textbf{W}}_t| \hat{\textbf{W}}_t = [\lambda^1_t\textbf{w}^1_t, \lambda^2_t\textbf{w}^2_t]\}, \quad \bm{\Lambda} = \{\bm{\lambda}_t| \bm{\lambda}_t=[\lambda^1_t, \lambda^2_t]\},
 \end{aligned}
 \end{equation}
 where~$[\textbf{w}^1_t, \textbf{w}^2_t]$ and~$[\lambda^1_t, \lambda^2_t]$ are the basis vectors and eigenvalues obtained by using the principal component method for the phase trajectory segment~$\textbf{s}_t$.
 
 
 
-Consider the distance function between points~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$ in the time series~$\textbf{x}$ for their clustering:
+Construct the distance function between points~$\mathbf{W}_{t_1},\mathbf{W}_{t_2}$ in the time series~$\textbf{x}$ for their clustering:
 \begin{equation}
 \label{eq:cl:4}
 \begin{aligned}
@@ -241,7 +275,7 @@ If all subspaces~$\textbf{W}_t$ have dimension two, then the distance function~$
 \end{equation}
 where~$\textbf{W}_1\cup\textbf{W}_2$ is a concatenation of bases,~$V\left(\textbf{a},\textbf{b},\textbf{c}\right)$ is the volume of parallelepiped built on vectors~$\textbf{a}, \textbf{b}, \textbf{c}$, which are columns of matrix~$\textbf{W}_1\cup\textbf{W}_2$.
 
-Consider the distance function between eigenvalues:
+Construct the distance function between eigenvalues:
 \begin{equation}
 \label{eq:cl:6}
 \begin{aligned}
@@ -249,7 +283,7 @@ Consider the distance function between eigenvalues:
 \end{aligned}
 \end{equation}
 
-Consider the distance between two points in time~$t_1, t_2$ by using equations~(\ref{eq:cl:5}-\ref{eq:cl:6}), and consider the matrix of pairwise distances between pairs of points in the time series:
+Construct the distance between two points in time~$t_1, t_2$ by using equations~(\ref{eq:cl:5}-\ref{eq:cl:6}), and consider the matrix of pairwise distances between pairs of points in the time series:
 \begin{equation}
 \label{eq:cl:9}
 \begin{aligned}
