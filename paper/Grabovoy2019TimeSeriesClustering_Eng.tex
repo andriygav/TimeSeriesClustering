@@ -27,7 +27,7 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
-\renewcommand{\baselinestretch}{1.35}
+\renewcommand{\baselinestretch}{1.5}
 
 
 \numberwithin{equation}{section}
@@ -35,7 +35,7 @@
 \newcommand*{\No}{No.}
 \begin{document}
 
-\title{\bf Analysis of the properties of local models in clustering problems of quasi-periodic time series\thanks{This research was supported by RFBR, project ..., and by Government of the Russian Federation, agreement ...}}
+\title{\bf Quasi-periodic time series clustering for human activity recognition\thanks{This research was supported by RFBR, project ..., and by Government of the Russian Federation, agreement ...}}
 \date{}
 \author{}
 \maketitle
@@ -47,14 +47,12 @@ A.\,V.~Grabovoy\footnote{Moscow Institute of Physics and Technology, grabovoy.av
 \end{center}
 
 {\centering\begin{quote}
-\textbf{Annotation:} The paper analysis periodic signals in the time series for recognize the physical actions of a person by using a mobile accelerometer. 
-The method of clustering points of the time series is proposed for searching quasi-periodic segments of the time series. 
-Time series are objects of a complex structure. 
-There are not any feature vector for describe points of a time series. 
-The paper proposes to consider principal components of the local neighborhood of the phase trajectory near some point for feature description of this point.
-The article proposes a distance function between points in the new space of objects.
-Clustering is carried out using a matrix of pairwise distances between the points in time series.
-The algorithm was tested on synthetic and real data. Real data was obtained by using a mobile accelerometer.
+\textbf{Annotation:} This paper analyses the periodic signals in the time series to recognize human activity by using a mobile accelerometer. 
+Each point in the timeline corresponds to a segment of historical time series. This segments form a phase trajectory in phase space of human activity.
+The principal components of segments of the phase trajectory are treated as feature descriptions at the point in the timeline.
+The paper introduces a new distance function between the points in new feature space.
+To reval changes of types of the human activity the paper proposes an algorithm. This algorithm clusters points of the timeline by using a pairwise distances matrix.
+The algorithm was tested on synthetic and real data. This real data were obtained from a mobile accelerometer.
 
 
 \smallskip
@@ -68,16 +66,14 @@ The algorithm was tested on synthetic and real data. Real data was obtained by u
 \section{Introduction}
 Analysis of a person’s physical activity is carried out by using mobile phones, smart watches etc~\cite{kwapisz2010, wang2014}.
 These devices are using an accelerometer, gyroscope and magnetometer. 
-The main purpose of this work is to markup and recognize human activity during the time~\cite{Ignatov2015, Olivares2012}, and also search for the beginning of a periodic signal~\cite{motrenko2015, cinar2018}.
+The main purpose of this work is to label and recognize human activity during the time~\cite{Ignatov2015, Olivares2012}, and also search for the beginning of a periodic signal~\cite{motrenko2015, cinar2018}.
 Examples of an action segment is a step, a step of running, a single squat, a single jump, etc.
-Current work considers an sequences  that consist of at least two consecutive segments that correspond to the same type of human activity.
+Current work considers a sequence that consists of at least two consecutive segments that correspond to the same type of human activity.
 
 \begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/example}\label{example:1}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/example_phase}\label{example:2}}\\
+\includegraphics[width=1\textwidth]{results_eng/introduction}
 \caption{A time series with clustering:  a) time series with assessor markings on clusters and markings at beginning of each quasi-periodic segment; b) projection of phase trajectories on the two principal components}
+\label{fig:introduction:1}
 \end{figure}
 
 Time series are objects of complex structure. 
@@ -86,9 +82,8 @@ In this article, the object of analysis, as well as clustering, is a point on th
 The paper investigates the problem of clustering points in a time series.
 \textit{Clustering} is a process in which all points in a time series are labeled with a label from the finite set of labels.
 Each label corresponds to one characteristic physical action.
-A \textit{segment} is a part of a time series that corresponds to one characteristic physical action, for example: a step with two legs when walking, or a step with two legs when running.
-A sequence of segments that correspond to one physical action form a \textit{chain} of actions.
-It is assumed that the chain of actions forms a quasi-periodic sequence of values of the time series.
+A \textit{segment} is a part of a time series that corresponds to one characteristic human physical action, for example: a step with two legs when walking, or a step with two legs when running.
+A sequence of segments that forms a quasi-periodic sequence is called a \textit{chain}.
 A sequence of points $\{b_t\}_{t=1}^{N}$ is called \textit{quasi-periodic} with period of $T$, if for all $t$ there is a $\Delta$, such that:
 \begin{equation}
 \label{eq:int:1}
@@ -96,21 +91,21 @@ A sequence of points $\{b_t\}_{t=1}^{N}$ is called \textit{quasi-periodic} with 
 b_t \approx b_{t+T+\Delta}, \quad \left|\Delta\right| \ll T.
 \end{aligned}
 \end{equation}
-An example of clustering and splitting a series into segments is shown in fig.~\ref{example:1}. 
-The time series is divided into two characteristic physical actions, which are marked Type~1 and Type~2. 
+An example of clustering and splitting a series into segments is shown in fig.~\ref{fig:introduction:1}.a. 
+The time series is divided into two characteristic type of segments, which are marked Type~1 and Type~2. 
 Also, this time series contains two quasi-periodic chains of actions.
 
-The proposed solution of the clustering problem for points in a time series consists of two stages.
+The proposed solution of the clustering problem for samples in a time series consists of two stages.
 First, an algorithm for local approximation of time series by using the principal component method~\cite{Shiglavsi1997} is proposed to obtain a feature description of points in the time series.
 \textit{Local approximation} of the time series means that only a certain neighborhood of a point is used to describe the features of their points.
 The two main components of the phase trajectory segment are considered as a feature description of a time series point.
-The fig.~\ref{example:2} shows the first two principal components of the phase trajectories, and also shows the projection of the phase trajectories on these components.
+The fig.~\ref{fig:introduction:1}.b shows the first two principal components of the phase trajectories, and also shows the projection of the phase trajectories on these components.
 The trajectories relate to different physical actions, which are denoted Type~1 and Type~2, in the time series.
 The planes that are generated by these basic components are different.
 That means that Type~1 and Type~2 are two different actions.
 Secondly, the distance function between points in the new feature space is considered.
 This function is the distance between two bases of some subspaces within the phase space of a time series.
-It can be explained by using fig~\ref{example:2}. The function is considered between two planes, which are defined by two different bases for the Type1 and Type2 segments.
+It can be explained by using fig~\ref{fig:introduction:1}.b. The function is considered between two planes, which are defined by two different bases for the Type1 and Type2 segments.
 Points can be clustered by using a pairwise distance matrix. 
 The segmentation problem is solved by using the main components~\cite{motrenko2015} of the phase trajectory in each cluster separately.
 
@@ -122,13 +117,18 @@ The quality analysis of the proposed clustering method is carried out on synthet
 A synthetic data constructed by using the sum of the first few terms of the Fourier series with random coefficients. But the experiment on the segmentation of the time series was carried out on simple sinusoidal signals with random amplitude and frequency.
 Real data was received by using a mobile accelerometer, which took readings during exercise of a person.
 
-\section{Literature analysis}
+\section{Related work}
 The paper~\cite{kwapisz2010} describes a method for constructing a feature description based on expertly defined generating functions.
 The article~\cite{lukashin2003} proposes a method for constructing features based on the data generation hypothesis.
 A combined feature description is introduced in the paper~\cite{Ivkin2015} based on these methods.
 The paper~\cite{Katrutsa2015} consider the problem of construction a feature space. The article proposes a criterion for the redundancy of the selected features.
 
-The Article\cite{motrenko2015} is the closest to our research.
+The paper~\cite{Ignatov2015} is the closest to our research.
+They proposed method for human physical activity recognition.
+To extract the fundamental period they construct the phase trajectory matrix, applying a technique of the principal component analysis. 
+This method allows you to find and classify segments in time series with great accuracy. But this method can work only with time series, in which all segments belong to the same characteristic action.
+
+The Article\cite{motrenko2015} is one of the closest to our research.
 The article searches for the beginning of a segment within a quasiperiodic signal, which consists of only one chain of actions.
 This method is based on the study of the phase space, namely, the search for a stable hyperplane that divides the phase space into two equal parts.
 The points that are close to this hyperplane are selected as the beginning and ending of the segment.
@@ -158,8 +158,8 @@ where~$N$ is a number of samples in the time series. The time series consists of
 \end{equation}
 where~$\textbf{v}_i$ is a segment from the set of segments~$\mathbf{V}$. It is supposed that the time series $\textbf{x}$ contains any $\textbf{v}_i$ from $\textbf{V}$.
 %which are observed in the time series $\textbf{x}$. 
-For all~$i$ either~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ or~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  is a  chain of action. The fig.~\ref{example_stat:1} shows an example of segments $\textbf{v}_i$.
-Each segments $\textbf{v}_{i}$ has no more than $T$ elements, $\left|\textbf{v}_{i}\right| \leq T$. The set $V$ has $K$ different types of segments, $\left|\mathbf{V}\right| = K$. The fig.~\ref{example_stat:1} shows an example of segments, which are constructed the chain of action~$[\textbf{v}_{i-1}, \textbf{v}_{i}, \textbf{v}_{i+1}]$.
+For all~$i$ either~$[\textbf{v}_{i-1},\textbf{v}_{i}]$ or~$[\textbf{v}_{i},\textbf{v}_{i+1}]$  is a  chain of action. The fig.~\ref{fig:statement:1}.a shows an example of segments $\textbf{v}_i$.
+Each segments $\textbf{v}_{i}$ has no more than $T$ elements, $\left|\textbf{v}_{i}\right| \leq T$. The set $V$ has $K$ different types of segments, $\left|\mathbf{V}\right| = K$. The fig.~\ref{fig:statement:1}.a shows an example of segments, which are constructed the chain of action~$[\textbf{v}_{i-1}, \textbf{v}_{i}, \textbf{v}_{i+1}]$.
 
 The figure shows an example of $ 1 $, $ 2 $ segments that belong to segments of the same type.
 
@@ -174,12 +174,9 @@ The figure shows an example of $ 1 $, $ 2 $ segments that belong to segments of 
 %where~$\left|\mathbf{V}\right|$ is a number of different action in the set of segments $\mathbf{V},$~$\left|\textbf{v}\right|$ is a length of segment,~$K$ is a number of different action in the time series $\textbf{x}$ and~$T$ is a length of maximum segment.
 
 \begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/example_stat}\label{example_stat:1}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/example_phase_stat}\label{example_stat:2}}\\
+\includegraphics[width=1\textwidth]{results_eng/statement}
 \caption{A time series and example of local information of points:  a) time series example of local information of time point~$t = 90$; b) projection of phase trajectories on the two principal components and example of segment~$\textbf{s}_t$ in time point~$t = 90$}
-\label{example_stat:0}
+\label{fig:statement:1}
 \end{figure}
 
 Construct the mapping
@@ -189,7 +186,7 @@ Construct the mapping
 a : t \to \mathbb{Y} = \{1,\cdots, K\}, 
 \end{aligned}
 \end{equation}
-where~$t \in \{1,\cdots, N\}$ is a point in the time line which defines the time series $\textbf{x}$.
+where~$t \in \{1,\cdots, N\}$ is a point in the timeline which defines the time series $\textbf{x}$.
 Let the map~$a$ satisfy the following properties:
 
 \begin{equation}
@@ -239,7 +236,7 @@ Split the phase trajectory into segments by using the maximum length of segments
 \mathbf{S} = \{\textbf{s}_t| \textbf{s}_t = [\textbf{h}_{t-T}, \textbf{h}_{t-T+1}, \cdots, \textbf{h}_{t+T-1}],~T\leq t\leq N-T\},
 \end{aligned}
 \end{equation}
-where $\textbf{s}_t$ is a segment of phase trajectory. The fig.~\ref{example_stat:2} shows an example of a phase trajectory segment. The segments have all local information about the time series, as it contains all the information on the period up to some time point~$t$ and information about the period after the time point~$t$.
+where $\textbf{s}_t$ is a segment of phase trajectory. The fig.~\ref{fig:statement:1}.b shows an example of a phase trajectory segment. The segments have all local information about the time series, as it contains all the information on the period up to some time point~$t$ and information about the period after the time point~$t$.
 
 
 
@@ -293,16 +290,22 @@ Construct the distance between two points in time~$t_1, t_2$ by using equations~
 where~$\textbf{M}$ is a matrix of pairwise distances between all pairs of points~$t$ in the time series~$\textbf{x}$.
 The pairwise distance matrix~$\textbf{M}$ is used for clustering points~$t$ of the time series~\eqref{eq:st:4}.
 
-\section{Experiment}
+\section{Computation experiment}
 \subsection{Points clustering}
+\begin{figure}[h!t]\center
+\includegraphics[width=1\textwidth]{results_eng/experiment_clustering}
+\caption{The result of the clustering algorithm for the time series "Physical~Motion~2": 
+a) a time series; b) the pairwise distance matrix for the time series; c) an example of clustering; d) Multidimensional Scaling of the points into two dimensional subspace by using pairwise distance matrix}
+\label{fig:experiment:1}
+\end{figure}
+
 In the experiment, the clustering of points in the time series was carried out using matrices of pairwise distances~$(\ref{eq:cl:9})$. 
-The experiment was carried out on real and synthetic data, which are described in the table~\ref{table_1}. 
+The experiment was carried out on real and synthetic data, which are described in the table~\ref{table:experiment:1}. 
 "Physical Motion" is a real time series obtained by using a mobile accelerometer. 
 Synthetic time series were constructed by using the first few terms of the Fourier series with random coefficients from the standard normal distribution.
+The generation of synthetic time series consisted of two stages.
 At the first stage, short segments~$\textbf{v}$ were generated to build a set of all segments~$\mathbf{V}$.
 The second stage is the following random process:
-
-The generation of synthetic time series consisted of two stages.
 \begin{equation}
 \label{eq:exp:1}
 \begin{aligned}
@@ -315,209 +318,104 @@ The generation of synthetic time series consisted of two stages.
 \end{equation}
 where~$\mathcal{U}\left(\mathbf{V}\right)$ is a uniform distribution on objects from the set~$\mathbf{V},$ and~$\bm{\varepsilon}$ is gaussian noise.
 
+The result of the algorithm for the real time series is shown in the fig.~\ref{fig:experiment:1}. The fig~\ref{fig:experiment:1}.b shows the matrix of pairwise distances for points in the timeline. Time series points can be easily visualised on a plane by using a pairwise distance matrix and a Multidimensional Scaling method~\cite{Borg2005}. The visualisation is shown in the fig.~\ref{fig:experiment:1}.d. The fig~\ref{fig:experiment:1}.c shows the result of clustering points. More results of clustering are presented in the table~\ref{table:experiment:1}.
+
+
 \begin{table}[h!t]
 \begin{center}
 \caption{Description of time series in the experiment}
-\label{table_1}
-\begin{tabular}{|c|c|c|c|}
-\hline
-	Series,~$\textbf{x}$ &Length,~$N$& Number of segments,~$K$& Period,~$T$\\
-	\hline
-	\multicolumn{1}{|l|}{Physical~Motion~1}
-	& 900& 2& 40\\
-	\hline
-	\multicolumn{1}{|l|}{Physical~Motion~2}
-	& 900& 2& 40\\
-	\hline
-	\multicolumn{1}{|l|}{Synthetic~1}
-	& 2000& 2& 20\\
-	\hline
-	\multicolumn{1}{|l|}{Synthetic~2}
-	& 2000& 3& 20\\
-\hline
-
-\end{tabular}
-\end{center}
-\end{table}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/2_patern_2_series}\label{fig_synthetic_series_2}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/3_patern_2_series}\label{fig_synthetic_series_3}}\\
-\caption{Example of synthetic time series: a) Synthetic~1; b) Synthetic~2}
-\label{fig_synthetic_series}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/2_patern_2_full}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/3_patern_2_full}}\\
-\caption{Pairwise distance matrix~$\textbf{M}$ between points of time series: a) Synthetic~1; b) Synthetic~2}
-\label{fig_synthetic_distance}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/2_patern_2_2D_vector}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/3_patern_2_2D_vector}}\\
-\caption{The projection of points on a plane by using the pairwise distance matrix~$\textbf{M}$: a) Synthetic~1; b) Synthetic~2}
-\label{fig_synthetic_2D}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/2_patern_2_claster_vector}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/3_patern_2_claster_vector}}\\
-\caption{Time series points clustering: a) Synthetic~1; b) Synthetic~2}
-\label{fig_synthetic_claster}
-\end{figure}
-
-\paragraph{Synthetic data.}
-
-The fig.~\ref{fig_synthetic_series} shows an example of synthetic time series.
-The fig.~\ref{fig_synthetic_series_2} shows an example of a time series in which the number of different segments is~$K = 2$, and the maximum length of segments is~$T = 20$.
-The fig.~\ref{fig_synthetic_series_3} shows an example of a time series in which the number of different segments is~$K = 3$, and the maximum length of segments is~$T = 20$.
-
-The fig.~\ref{fig_synthetic_distance} illustrates the pairwise distance matrix~$\textbf{M}$ between all pairs of points~$t$ in the time series, which are constructed by using equention~(\ref{eq:cl:9}).
-Time series points can be easily visualized on a plane by using a pairwise distance matrix and a Multidimensional Scaling method~\cite{Borg2005}.
-The fig.~\ref{fig_synthetic_2D} shows the visualization of points on the plane and performed their clustering by using the hierarchical clustering method.
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_1_series}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_2_series}}\\
-\caption{Example of real time series: a) Physical~Motion~1; b) Physical~Motion~2}
-\label{fig_real_series}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_1_full}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_2_full}}\\
-\caption{Pairwise distance matrix~$\textbf{M}$ between points of time series:  a) Physical~Motion~1; b) Physical~Motion~2}
-\label{fig_real_distance}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_1_2D_vector}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_2_2D_vector}}\\
-\caption{The projection of points on a plane by using the pairwise distance matrix~$\textbf{M}$: a) Physical~Motion~1; b) Physical~Motion~2}
-\label{fig_real_2D}
-\end{figure}
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_1_claster_vector}}
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_2_claster_vector}}\\
-\caption{Time series points clustering: 
-a) Physical~Motion~1; b) Physical~Motion~2}
-\label{fig_real_claster}
-\end{figure}
-
-\paragraph{Real data.}
-
-The fig.~\ref{fig_real_series} shows an example of real time series obtained using a mobile accelerometer.
-
-The fig.~\ref{fig_real_distance} illustrates the pairwise distance matrix~$\textbf{M}$ between all pairs of points~$t$ in the time series, which are constructed by using equention~(\ref{eq:cl:9}).
-Time series points can be easily visualized on a plane by using a pairwise distance matrix and a Multidimensional Scaling method~\cite{Borg2005}.
-The fig.~\ref{fig_real_2D} shows the visualization of points on the plane and performed their clustering by using the hierarchical clustering method.
-
-\subsection{Time series segmentation}
-Time series segmentation is carried out on synthetic and real data. 
-A synthetic time series for this experiment were constructed by using the concatenation of two different sinusoidal signals with different amplitude and frequency.
-The experiment was carried out on real and synthetic data, which are described in the table~\ref{table:3}.
-
-Segmentation is carried out by using the method that is presented in the work~\cite{motrenko2015}. The method is used for each action within the time series separately.
-
-\begin{table}[h!t]
-\begin{center}
-\caption{Description of time series in the experiment of segmentation}
-\label{table:3}
-\begin{tabular}{|c|c|c|c|}
-\hline
-	Series,~$\textbf{x}$ & Length,~$N$& Number of segments,~$K$& Period,~$T$\\
-	\hline
-	\multicolumn{1}{|l|}{Simple~1}
-	& 1000& 2& 100\\
-	\hline
-	\multicolumn{1}{|l|}{Physical~Motion~2}
-	& 900& 2& 40\\
-\hline
-
-\end{tabular}
-\end{center}
-\end{table}
-
-\paragraph{Synthetic data.}
-The fig.~\ref{fig_simple_segmentation} shows the result of the segmentation for the Simple~1 time series.
-The algorithm is well marked the beginning of the segments.
-
-The fig.~\ref{fig_simple_segmentation} shows the projections of the phase spaces for both clusters onto their first two main components.
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/simple_1_segmentation_vector}}
-\subfloat[]
-{\includegraphics[width=0.25\textwidth]{results/simple_1_phase_space0}}
-\subfloat[]
-{\includegraphics[width=0.25\textwidth]{results/simple_1_phase_space1}}\\
-\caption{Segmentation for the Simple~1 time series: 
-a) time series segmentation; b) the projection of the phase space on the first two principal components for the first cluster; c) the projection of the phase space on the first two principal components for the second cluster;}
-\label{fig_simple_segmentation}
-\end{figure}
-
-\paragraph{Real data.}
-The fig.~\ref{fig_simple_segmentation} shows the result of the segmentation for the Physical~Motion~2 time series.
-The algorithm is well marked the beginning of the segments for Type~1 and bad for Type~2.
-The fig.~\ref{fig_simple_segmentation} shows the projections of the phase spaces for both clusters onto their first two main components.
-Bad segmentation was obtained due to self-intersection of the phase trajectory.
-
-\begin{figure}[h!t]\center
-\subfloat[]
-{\includegraphics[width=0.5\textwidth]{results/real_2_segmentation_vector}}
-\subfloat[]
-{\includegraphics[width=0.25\textwidth]{results/real_2_phase_space0}}
-\subfloat[]
-{\includegraphics[width=0.25\textwidth]{results/real_2_phase_space1}}\\
-\caption{Segmentation for the Physical~Motion~2 time series: 
-a) time series segmentation; b) the projection of the phase space on the first two principal components for the first cluster; c) the projection of the phase space on the first two principal components for the second cluster;}
-\label{fig_real_segmentation}
-\end{figure}
-
-\section{Conclusion}
-\begin{table}[h!t]
-\begin{center}
-\caption{Algorithm analysis results}
-\label{table_2}
+\label{table:experiment:1}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-	Series,~$\textbf{x}$ & Length,~$N$& Number of segments,~$K$& Period,~$T$& Error,~$S$\\
+	Series,~$\textbf{x}$ &Length,~$N$& Number of segments,~$K$& Period,~$T$ & Error,~$S$\\
 	\hline
-	\multicolumn{1}{|l|}{Phys.~Motion~1}
-	& 900& 2& 40& 0.06\\
+	\multicolumn{1}{|l|}{Physical~Motion~1}
+	& 900& 2& 50& 0.03\\
 	\hline
-	\multicolumn{1}{|l|}{Phys.~Motion~2}
-	& 900& 2& 40& 0.03\\
+	\multicolumn{1}{|l|}{Physical~Motion~2}
+	& 900& 2& 35& 0.08\\
+	\hline
+	\multicolumn{1}{|l|}{Physical~Motion~3}
+	& 900& 2& 30& 0.09\\
+	\hline
+	\multicolumn{1}{|l|}{Physical~Motion~4}
+	& 800& 2& 50& 0.01\\
 	\hline
 	\multicolumn{1}{|l|}{Synthetic~1}
-	& 2000& 2& 20& 0.04\\
+	& 2000& 3& 40& 0.008\\
 	\hline
 	\multicolumn{1}{|l|}{Synthetic~2}
-	& 2000& 3& 20& 0.03\\
+	& 2000& 2& 40& 0.06\\
+	\hline
+	\multicolumn{1}{|l|}{Synthetic~3}
+	& 2000& 2& 40& 0.03\\
+	\hline
+	\multicolumn{1}{|l|}{Synthetic~4}
+	& 2000& 2& 40& 0.03\\
+	\hline
+	\multicolumn{1}{|l|}{Synthetic~5}
+	& 2000& 2& 40& 0.04\\
+	\hline
+	\multicolumn{1}{|l|}{Simple}
+	& 1000& 2& 135& 0.14\\
 \hline
 
 \end{tabular}
 \end{center}
 \end{table}
+
+
+
+
+
+%\paragraph{Synthetic data.}
+
+%The fig.~\ref{fig_synthetic_series} shows an example of synthetic time series.
+%The fig.~\ref{fig_synthetic_series_2} shows an example of a time series in which the number of different segments is~$K = 2$, and the maximum length of segments is~$T = 20$.
+%The fig.~\ref{fig_synthetic_series_3} shows an example of a time series in which the number of different segments is~$K = 3$, and the maximum length of segments is~$T = 20$.
+
+%The fig.~\ref{fig_synthetic_distance} illustrates the pairwise distance matrix~$\textbf{M}$ between all pairs of points~$t$ in the time series, which are constructed by using equention~(\ref{eq:cl:9}).
+%Time series points can be easily visualized on a plane by using a pairwise distance matrix and a Multidimensional Scaling method~\cite{Borg2005}.
+%The fig.~\ref{fig_synthetic_2D} shows the visualization of points on the plane and performed their clustering by using the hierarchical clustering method.
+
+%\paragraph{Real data.}
+
+%The fig.~\ref{fig_real_series} shows an example of real time series obtained using a mobile accelerometer.
+
+%The fig.~\ref{fig_real_distance} illustrates the pairwise distance matrix~$\textbf{M}$ between all pairs of points~$t$ in the time series, which are constructed by using equention~(\ref{eq:cl:9}).
+%Time series points can be easily visualized on a plane by using a pairwise distance matrix and a Multidimensional Scaling method~\cite{Borg2005}.
+%The fig.~\ref{fig_real_2D} shows the visualization of points on the plane and performed their clustering by using the hierarchical clustering method.
+
+\subsection{Time series segmentation}
+\begin{figure}[h!t]\center
+\includegraphics[width=1\textwidth]{results_eng/experiment_segmentation}
+\caption{The result of the segmentation algorithm for the time series "Physical~Motion~2": 
+a) a time series segmentation; b) a phase trajectory for cluster "Type~1"; c) a phase trajectory for cluster "Type~2"}
+\label{fig:experiment:2}
+\end{figure}
+
+The time series segmentation is shown on the example of real data obtained by using a mobile accelerometer. Segmentation is carried out by using the method that is presented in the work~\cite{motrenko2015}. The method is used for each action within the time series separately.
+The fig.~\ref{fig:experiment:2} shows the result of the segmentation algorithm for the time series "Physical~Motion~2". The segmentation result for a cluster "Type~1" is much better than for a cluster "Type~2". This result is easily explained by using fig.~\ref{fig:experiment:2}.b and fig.~\ref{fig:experiment:2}.c. The fig.~\ref{fig:experiment:2}.b is a phase trajectory for cluster "Type~1". This phase trajectory has no self-intersections in contrast to the phase trajectory shown in the fig.~\ref{fig:experiment:2}.c.
+As a result, for time series with a simple phase trajectory, this method performs the time series segmentation well.
+
+%Time series segmentation is carried out on synthetic and real data. 
+%A synthetic time series for this experiment were constructed by using the concatenation of two different sinusoidal signals with different amplitude and frequency.
+%The experiment was carried out on real and synthetic data, which are described in the table~\ref{table:3}.
+
+%\paragraph{Synthetic data.}
+%The fig.~\ref{fig_simple_segmentation} shows the result of the segmentation for the Simple~1 time series.
+%The algorithm is well marked the beginning of the segments.
+
+%The fig.~\ref{fig_simple_segmentation} shows the projections of the phase spaces for both clusters onto their first two main components.
+
+%\paragraph{Real data.}
+%The fig.~\ref{fig_simple_segmentation} shows the result of the segmentation for the Physical~Motion~2 time series.
+%The algorithm is well marked the beginning of the segments for Type~1 and bad for Type~2.
+%The fig.~\ref{fig_simple_segmentation} shows the projections of the phase spaces for both clusters onto their first two main components.
+%Bad segmentation was obtained due to self-intersection of the phase trajectory.
+
+\section{Conclusion}
+
 
 The paper considered the problem of finding periodic structures within a time series.
 A method based on local reduction of the phase space dimension was considered.
@@ -527,7 +425,7 @@ Also introduced is the function of the distance between local basis at each time
 Local bases were interpreted as a features description of a point in the time series.
 
 During the experiment on the real and synthetic data showed that the proposed method for measuring the distance between the basis well separates points that are related to different type of action, which leads to good clustering of time series points.
-The results of the experiment are shown in the table~\ref{table_2}.
+The results of the experiment are shown in the table~\ref{table:experiment:1}.
 The experiment was carried out segmentation of time series by using the method~\cite{motrenko2015} for each cluster separately.
 
 The proposed method has few disadvantages associated with a large number of assumption on a time series.
@@ -557,7 +455,7 @@ It is also planned to solve the problem of finding the minimum dimension of the 
 	\textit{Y. P. Lukashin} Adaptive methods for short-term forecasting~// Finansy and Statistik, 2003.
 	
 	\bibitem{Ivkin2015}
-	\textit{M. P. Kuznetsov,  N. P. Ivkin} Time series classification algorithm using combined feature description~// Machine Learning and Data Analysis, 2015,~11(1). P.~1471-1483.
+	\textit{M. P. Kuznetsov,  N. P. Ivkin} Time series classification algorithm using combined feature description~// Machine Learning and Data Analysis, 2015,~11(1). P.~1471--1483.
 	
 	\bibitem{Katrutsa2015}
 	\textit{V. V. Strijov, A. M. Katrutsa} Stresstes procedures for features selection algorithms.~// Schemometrics and Intelligent Laboratory System, 2015.
@@ -568,6 +466,8 @@ It is also planned to solve the problem of finding the minimum dimension of the 
 	\bibitem{Shiglavsi1997}
 	\textit{D. L. Danilov, A. A. Zhiglovsky} Main components of time series: method "Gesenitsa".~---~St.~Petersburg University, 1997.
 	
+	\bibitem{Ignatov2015}
+	\textit{A.D. Ignatov, V. V. Strijov} Human activity recognition using quasi-periodic time series collected from a single triaxial accelerometer.~// Multimedia Tools and Applications, 2015, P.~1--14.
 
 	
 \end{thebibliography}

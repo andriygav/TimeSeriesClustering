@@ -15,6 +15,8 @@ import torch.optim as optim
 
 from sklearn.decomposition import PCA
 
+from scipy.interpolate import interp1d
+
 import math
 
 
@@ -104,7 +106,7 @@ def local_basis(phase_track, m = 2, T = 20):
 
     model_pca = PCA(n_components=2)
 
-    for n in tqdm(range(T, result_pca_1.shape[0] - T, 1)):
+    for n in range(T, result_pca_1.shape[0] - T, 1):
         if n-T >- 0:
             arr = result_pca_1[n-T:n+T]
         else:
@@ -170,7 +172,7 @@ def get_pairwise_matrix(List_of_basis_vector, List_of_basis_vector_s, List_of_ba
           
     vol = np.max(Volum, axis = 0)
 
-    for i in tqdm(range(vol.shape[0])):
+    for i in range(vol.shape[0]):
         for j in range(vol.shape[0]):
             vol[i,j] = max(vol[i,j], vol[j,i])  
 
@@ -266,3 +268,24 @@ def segmentation(X_all, prediction_vector, T):
 
     return List_of_All, List_of_point
 
+def normalizer(x, t, n = None):
+    if n == None:
+        t_new = np.arange(np.min(t), np.max(t), 0.01)
+    else:
+        t_new = np.linspace(np.min(t), np.max(t), n, endpoint=True)
+    
+    f = interp1d(t, x, kind='cubic')
+    
+    return f(t_new)
+
+def sort_prediction(prediction_vector):
+    prediction_vector += 1000
+    iterator = 0
+
+    need = np.where(prediction_vector >= 1000)[0]
+    while len(need) > 0:
+        prediction_vector[np.where(prediction_vector == prediction_vector[need[0]])] = iterator
+        iterator += 1
+        need = np.where(prediction_vector >= 1000)[0]
+        
+    return prediction_vector
